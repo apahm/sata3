@@ -1,8 +1,8 @@
 
 # FPGA settings
-FPGA_PART = xcvu095-ffva2104-2-e
+FPGA_PART = xc7k325tffg900-2
 FPGA_TOP = fpga
-FPGA_ARCH = VirtexUltrascale
+FPGA_ARCH = kintex7
 
 # Files for synthesis
 SYN_FILES = rtl/fpga.v
@@ -11,7 +11,7 @@ SYN_FILES = rtl/fpga.v
 XDC_FILES = fpga.xdc
 
 # IP
-IP_TCL_FILES = ip/pcie3_ultrascale_0.tcl
+IP_TCL_FILES = ip/gt_wizard.tcl
 
 include ../common/vivado.mk
 
