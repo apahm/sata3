@@ -195,54 +195,6 @@ module sata_phy_layer #(
 
     wire            reset_on_data_error_i;
     wire            track_data_out_i;
-  
-
-    //--------------------- Chipscope Signals ---------------------------------
-    (*mark_debug = "TRUE" *)wire   rxresetdone_vio_i;
-    wire    [35:0]  tx_data_vio_control_i;
-    wire    [35:0]  rx_data_vio_control_i;
-    wire    [35:0]  shared_vio_control_i;
-    wire    [35:0]  ila_control_i;
-    wire    [35:0]  channel_drp_vio_control_i;
-    wire    [35:0]  common_drp_vio_control_i;
-    wire    [31:0]  tx_data_vio_async_in_i;
-    wire    [31:0]  tx_data_vio_sync_in_i;
-    wire    [31:0]  tx_data_vio_async_out_i;
-    wire    [31:0]  tx_data_vio_sync_out_i;
-    wire    [31:0]  rx_data_vio_async_in_i;
-    wire    [31:0]  rx_data_vio_sync_in_i;
-    wire    [31:0]  rx_data_vio_async_out_i;
-    wire    [31:0]  rx_data_vio_sync_out_i;
-    wire    [31:0]  shared_vio_in_i;
-    wire    [31:0]  shared_vio_out_i;
-    wire    [163:0] ila_in_i;
-    wire    [31:0]  channel_drp_vio_async_in_i;
-    wire    [31:0]  channel_drp_vio_sync_in_i;
-    wire    [31:0]  channel_drp_vio_async_out_i;
-    wire    [31:0]  channel_drp_vio_sync_out_i;
-    wire    [31:0]  common_drp_vio_async_in_i;
-    wire    [31:0]  common_drp_vio_sync_in_i;
-    wire    [31:0]  common_drp_vio_async_out_i;
-    wire    [31:0]  common_drp_vio_sync_out_i;
-
-    wire    [31:0]  gt0_tx_data_vio_async_in_i;
-    wire    [31:0]  gt0_tx_data_vio_sync_in_i;
-    wire    [31:0]  gt0_tx_data_vio_async_out_i;
-    wire    [31:0]  gt0_tx_data_vio_sync_out_i;
-    wire    [31:0]  gt0_rx_data_vio_async_in_i;
-    wire    [31:0]  gt0_rx_data_vio_sync_in_i;
-    wire    [31:0]  gt0_rx_data_vio_async_out_i;
-    wire    [31:0]  gt0_rx_data_vio_sync_out_i;
-    wire    [163:0] gt0_ila_in_i;
-    wire    [31:0]  gt0_channel_drp_vio_async_in_i;
-    wire    [31:0]  gt0_channel_drp_vio_sync_in_i;
-    wire    [31:0]  gt0_channel_drp_vio_async_out_i;
-    wire    [31:0]  gt0_channel_drp_vio_sync_out_i;
-    wire    [31:0]  gt0_common_drp_vio_async_in_i;
-    wire    [31:0]  gt0_common_drp_vio_sync_in_i;
-    wire    [31:0]  gt0_common_drp_vio_async_out_i;
-    wire    [31:0]  gt0_common_drp_vio_sync_out_i;
-
 
     wire            gttxreset_i;
     wire            gtrxreset_i;
