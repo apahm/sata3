@@ -6,19 +6,18 @@ FPGA_ARCH = kintex7
 
 # Files for synthesis
 SYN_FILES = rtl/crc.v
-SYN_FILES += rtl/defines.v
 SYN_FILES += rtl/fpga.v
 SYN_FILES += rtl/gtwizard_common.v
 SYN_FILES += rtl/gtwizard_common_reset.v
 SYN_FILES += rtl/gtwizard_gt_usrclk_source.v
 SYN_FILES += rtl/gtwizard_support.v
-SYN_FILES += rtl/link_layer_host.v
+SYN_FILES += rtl/sata_link_layer.v
 SYN_FILES += rtl/oob_control.v
 SYN_FILES += rtl/sata_phy_layer.v
-SYN_FILES += rtl/sata_link.v
 SYN_FILES += rtl/sata_top.v
 SYN_FILES += rtl/sata_transport.v
 SYN_FILES += rtl/scrambler.v
+SYN_FILES += rtl/defines.vh
 
 # XDC files
 XDC_FILES = fpga.xdc
