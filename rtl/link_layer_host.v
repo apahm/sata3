@@ -1,13 +1,3 @@
-//  Project     : SATA Host controller
-//  Title       : Link Layer
-//  File name   : link_layer_host.v
-//  Note        : This module is handling dtalayer operations of the SATA 
-//                protocol small block decription given below
-//                
-//  Design ref. : SATA3 Specification
-//  Dependencies   : defines.h
-///////////////////////////////////////////////////////////////////////////////
-
 /******************************************************************************
                    LINK LAYER
 
@@ -30,10 +20,10 @@
            
 data_in_p(data_in_p_int)    data_out_t_int  data_crc_out_rx
 ******************************************************************************/
+`include "defines.v"
 
+`timescale 1ns / 1ps
 
-`include "defines.h"
-   
 module link_layer#(
     parameter integer CHIPSCOPE = 0
     )

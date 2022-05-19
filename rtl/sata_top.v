@@ -1,18 +1,9 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////
-//  Project     : SATA Host controller
-//  Title       : SATA Host Controller TOP Module
-//  File name   : SATA_TOP.v
-//  Note        : This is the top module of SATA2 Host Controller              
-//  Design ref. : SATA3 Specification
-//  Test/Verification Environment
-//  Dependencies   : Nil
-//////////////////////////////////////////////////////////////////////////////
 
 module SATA_CONTROLLER#(
     parameter integer CHIPSCOPE = 0
-    )
-    (
+)
+(
     input           TILE0_REFCLK_PAD_P_IN,       // Input differential clock pin P 150MHZ 
     input           TILE0_REFCLK_PAD_N_IN,       // Input differential clock pin N 150MHZ
     input           GTPRESET_IN,                 // Reset input for GTP initialization
@@ -26,7 +17,6 @@ module SATA_CONTROLLER#(
     output          DCMLOCKED_OUT,               // PHY Layer DCM locked
     output          LINKUP,                      // SATA PHY initialisation completed LINK UP
     output [1:0]    GEN,                         // 2 when a SATA3, 1 when a SATA2 device detected, 0 when SATA1 device detected
-  //output          PHY_CLK_OUT,                 // PHY layer clock out
     output          CLK_OUT,                     // LINK and Transport Layer clock out CLK_OUT = PHY_CLK_OUT / 2
     input           HOST_READ_EN,                // Read enable from host / user logic for Shadow register and PIO data
     input           HOST_WRITE_EN,               // Write enable from host / user logic for Shadow register and PIO data
@@ -54,8 +44,7 @@ module SATA_CONTROLLER#(
     input           OOB_reset_IN,
     input           RX_FSM_reset_IN,
     input           TX_FSM_reset_IN    
-    
-    );
+);
 
  
   wire  [31:0]  phy_rx_data_out;
@@ -120,7 +109,8 @@ module SATA_CONTROLLER#(
   assign R_ERR         = r_err_t;
   assign ILLEGAL_STATE = illegal_state_t;
   
-  sata_phy PHY 
+  sata_phy 
+  sata_phy_inst 
   (
     .TILE0_REFCLK_PAD_P_IN  (TILE0_REFCLK_PAD_P_IN),
     .TILE0_REFCLK_PAD_N_IN  (TILE0_REFCLK_PAD_N_IN),
@@ -141,7 +131,7 @@ module SATA_CONTROLLER#(
     .logic_reset            (logic_reset),
     .OOB_reset_IN           (OOB_reset_IN),
     .RX_FSM_reset_IN        (RX_FSM_reset_IN),
-		.TX_FSM_reset_IN        (TX_FSM_reset_IN)    
+	.TX_FSM_reset_IN        (TX_FSM_reset_IN)    
     
 	);
   

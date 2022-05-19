@@ -1,6 +1,5 @@
-/********************************SATA COMMAND LAYER & TRANSPORT LAYER IMPLEMENTATION*****************************************
+`timescale 1ns / 1ps
 
-************************************************************************************************************/
 module sata_transport (
    input                clk,
    input                reset,                   
@@ -1492,9 +1491,6 @@ module sata_transport (
     end
   end // main state machine end
               
-                    
-
-
   // transmit fifo ...........................
    assign tx_fifo_din       = DMA_RQST ? DMA_TX_DATA_IN : data_register_in ;    //   transmit data from dma to tx fifo connected to   sata_din
    assign tx_fifo_wr_en     = DMA_RQST ? (DMA_TX_WEN && CE)   : tx_fifo_pio_wr_en;

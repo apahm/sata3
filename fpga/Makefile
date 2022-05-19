@@ -5,13 +5,29 @@ FPGA_TOP = fpga
 FPGA_ARCH = kintex7
 
 # Files for synthesis
-SYN_FILES = rtl/fpga.v
+SYN_FILES = rtl/crc.v
+SYN_FILES += rtl/defines.v
+SYN_FILES += rtl/fpga.v
+SYN_FILES += rtl/gtwizard_common.v
+SYN_FILES += rtl/gtwizard_common_reset.v
+SYN_FILES += rtl/gtwizard_gt_usrclk_source.v
+SYN_FILES += rtl/gtwizard_support.v
+SYN_FILES += rtl/link_layer_host.v
+SYN_FILES += rtl/oob_control.v
+SYN_FILES += rtl/sata_phy_layer.v
+SYN_FILES += rtl/sata_link.v
+SYN_FILES += rtl/sata_top.v
+SYN_FILES += rtl/sata_transport.v
+SYN_FILES += rtl/scrambler.v
 
 # XDC files
 XDC_FILES = fpga.xdc
 
 # IP
 IP_TCL_FILES = ip/gt_wizard.tcl
+IP_TCL_FILES += ip/dma_rx_fifo.tcl
+IP_TCL_FILES += ip/dma_tx_fifo.tcl
+IP_TCL_FILES += ip/general_fifo.tcl
 
 include ../common/vivado.mk
 
