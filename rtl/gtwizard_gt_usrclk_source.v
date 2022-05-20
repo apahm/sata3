@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module gtwizard_0_GT_USRCLK_SOURCE 
+module gtwizard_gt_usrclk_source 
 (
     output wire  GT0_TXUSRCLK_OUT,
     output wire  GT0_TXUSRCLK2_OUT,

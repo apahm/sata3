@@ -3,7 +3,7 @@
 //---------------------------------------------------------------------/                                                                          
 `timescale 1ns / 1ps
 module scrambler(                                                                                                                                        
-   input             clk      
+   input             clk,      
    input             rst,
    input             scram_rst,                                                                                                                                       
    input             scram_en,                                                                                                                                        

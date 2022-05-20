@@ -1,56 +1,55 @@
 `timescale 1ns / 1ps
 
 module sata_transport (
-   input                clk,
-   input                reset,                   
-   input                DMA_RQST,                     // host sets during DMA Read or Write operations
-   input   [31:0]       data_in,                      // from host : shadow register write data
-   input   [4:0]        addr_reg,                     // Address line 
-   input   [31:0]       data_link_in,                 // from link layer to transport data_in
-   input                LINK_DMA_ABORT,               // Notification  from  Link layer that the DMA Abort primitive was received
-   input                link_fis_recved_frm_dev,      // from link layer to inform that new fis received from PHY
-   input                phy_detect,                   // from link phy detection
-   input                H_write,                      // from host to transport ...reg H_write
-   input                H_read,                       // from host to transport ...reg H_read
-   input                link_txr_rdy,                 // from link, link sends it satus when link receive txr rdy from transport
-   input                r_ok,                         // from link successful reception
-   input                r_error,                      // from link error in reception
-   input                illegal_state,                // from link link denotes illegal state transition to transport
-   input                end_status,                   // from link eof
-   output      [31:0]   data_link_out,                // from transport data out to link
-   output               FRAME_END_T,                  // T-layer indicates all data for the frame has been transferred
-   output  reg          IPF,                          // interrupt bit is set by the device, TL set  interrupt pending flag to host
-   output  reg          hold_L,                       // to link layer :To indicate that the RX Fifo is full
-   output               WRITE_HOLD_U,                 // inform the host Layer that  the TX  Fifo is full or RX fifo is empty
-   output               READ_HOLD_U,
-   output  reg          txr_rdy,                      // to link layer transport is H_ready to send pkt to link
-   output  reg [31:0]   data_out,                     // data read from transport to host
-   output  reg          EscapeCF_T,                   // During SRST Link layer shall be informed to send  EscapeCF_TP   by TL.
+    input                clk,
+    input                reset,                   
+    input                DMA_RQST,                     // host sets during DMA Read or Write operations
+    input   [31:0]       data_in,                      // from host : shadow register write data
+    input   [4:0]        addr_reg,                     // Address line 
+    input   [31:0]       data_link_in,                 // from link layer to transport data_in
+    input                LINK_DMA_ABORT,               // Notification  from  Link layer that the DMA Abort primitive was received
+    input                link_fis_recved_frm_dev,      // from link layer to inform that new fis received from PHY
+    input                phy_detect,                   // from link phy detection
+    input                H_write,                      // from host to transport ...reg H_write
+    input                H_read,                       // from host to transport ...reg H_read
+    input                link_txr_rdy,                 // from link, link sends it satus when link receive txr rdy from transport
+    input                r_ok,                         // from link successful reception
+    input                r_error,                      // from link error in reception
+    input                illegal_state,                // from link link denotes illegal state transition to transport
+    input                end_status,                   // from link eof
+    output      [31:0]   data_link_out,                // from transport data out to link
+    output               FRAME_END_T,                  // T-layer indicates all data for the frame has been transferred
+    output  reg          IPF,                          // interrupt bit is set by the device, TL set  interrupt pending flag to host
+    output  reg          hold_L,                       // to link layer :To indicate that the RX Fifo is full
+    output               WRITE_HOLD_U,                 // inform the host Layer that  the TX  Fifo is full or RX fifo is empty
+    output               READ_HOLD_U,
+    output  reg          txr_rdy,                      // to link layer transport is H_ready to send pkt to link
+    output  reg [31:0]   data_out,                     // data read from transport to host
+    output  reg          EscapeCF_T,                   // During SRST Link layer shall be informed to send  EscapeCF_TP   by TL.
    
-   output  reg          UNRECGNZD_FIS_T,              // to LL :asserted, when the host TL receives a FIS with unknown type
-   output  reg          FIS_ERR,                      // to link layer
-   output  reg          Good_status_T,                // to LL : Asserted in return to getting the VALID_CRC_T from the LL
-   output  reg          cmd_done,                     // to host : inidicates that the given command is over 
-   input     [31:0]     DMA_TX_DATA_IN,               // from host : data line for DMA write operation
-   input                DMA_TX_WEN,                   // from host : data write enable signal to TX FIFO during DMA write
-   output    [31:0]     DMA_RX_DATA_OUT,              // to host : data line for DMA read operation
-   input                DMA_RX_REN,                   // from host : data read enable signal to RX FIFO during DMA read
-   input                VALID_CRC_T,                  // from LL : no CRC error
-   input                data_out_vld_T,               // from LL : valid data
-   input                CRC_ERR_T,                    // from LL :  CRC error
-   input                DMA_INIT,                     // from host : completed DMA initialization
-   output  reg          DMA_END,
-   output               DATA_RDY_T,                   // to LL : T-layer indicates the availability of next Dword 
-   output               RX_FIFO_RDY,                  // Receive FIFO ready
-   input                data_link_rd_en_t,            // read enable from link layer for tx data out
-   input                PIO_CLK_IN,                   // Clock for PIO transfer
-   input                DMA_CLK_IN,                   // Clock for DMA transfer
-   input                CE,                           // Chip enable,
-   input                RX_FIFO_RESET,                // RX fifo reset
-   input                TX_FIFO_RESET,                // TX fifo reset
-   output reg           DMA_data_rcv_error            // Indicates error during DMA data receive
-
-   ); 
+    output  reg          UNRECGNZD_FIS_T,              // to LL :asserted, when the host TL receives a FIS with unknown type
+    output  reg          FIS_ERR,                      // to link layer
+    output  reg          Good_status_T,                // to LL : Asserted in return to getting the VALID_CRC_T from the LL
+    output  reg          cmd_done,                     // to host : inidicates that the given command is over 
+    input     [31:0]     DMA_TX_DATA_IN,               // from host : data line for DMA write operation
+    input                DMA_TX_WEN,                   // from host : data write enable signal to TX FIFO during DMA write
+    output    [31:0]     DMA_RX_DATA_OUT,              // to host : data line for DMA read operation
+    input                DMA_RX_REN,                   // from host : data read enable signal to RX FIFO during DMA read
+    input                VALID_CRC_T,                  // from LL : no CRC error
+    input                data_out_vld_T,               // from LL : valid data
+    input                CRC_ERR_T,                    // from LL :  CRC error
+    input                DMA_INIT,                     // from host : completed DMA initialization
+    output  reg          DMA_END,
+    output               DATA_RDY_T,                   // to LL : T-layer indicates the availability of next Dword 
+    output               RX_FIFO_RDY,                  // Receive FIFO ready
+    input                data_link_rd_en_t,            // read enable from link layer for tx data out
+    input                PIO_CLK_IN,                   // Clock for PIO transfer
+    input                DMA_CLK_IN,                   // Clock for DMA transfer
+    input                CE,                           // Chip enable,
+    input                RX_FIFO_RESET,                // RX fifo reset
+    input                TX_FIFO_RESET,                // TX fifo reset
+    output reg           DMA_data_rcv_error            // Indicates error during DMA data receive
+); 
    
 
 
@@ -1507,22 +1506,25 @@ module sata_transport (
   assign WRITE_HOLD_U       = tx_fifo_prog_full;
   assign READ_HOLD_U        = rcv_fifo_almost_empty; 
   
-  always @(posedge clk) 
-  begin
+always @(posedge clk) begin
     rcv_fifo_din <= data_link_in;
-  end
+end
   
-  BUFGMUX_CTRL BUFGMUX_CTRL_inst (
+BUFGMUX_CTRL 
+BUFGMUX_CTRL_inst 
+(
     .O (rx_fifo_rd_clk ),    // Clock MUX output
     .I0(PIO_CLK_IN),         // Clock0 input
     .I1(DMA_CLK_IN),         // Clock1 input
     .S (DMA_RQST)            // Clock select input
-   );
+);
 
-  assign tx_fifo1_reset = reset || TX_FIFO_RESET;
+assign tx_fifo1_reset = reset || TX_FIFO_RESET;
 
-  //PIO and DMA Transmit FIO
-  fifo_generator_v8_3 TX_FIFO1 (
+//PIO and DMA Transmit FIO
+dma_tx_fifo
+dma_tx_fifo_inst
+(
     .rst           (tx_fifo1_reset),      // input rst
     .wr_clk        (rx_fifo_rd_clk),      // input wr_clk
     .rd_clk        (clk),                 // input rd_clk
@@ -1534,12 +1536,14 @@ module sata_transport (
     .empty         (tx_fifo_empty),       // output empty
     .almost_empty  (tx_fifo_almost_empty),
     .prog_full     (tx_fifo_prog_full)    // output prog_full
-  );
+);
   
-  assign rx_fifo1_reset = reset || RX_FIFO_RESET;
+assign rx_fifo1_reset = reset || RX_FIFO_RESET;
   
-  //PIO and DMA Receive FIFO  
-  RX_FIFO RX_FIFO1 (
+//PIO and DMA Receive FIFO  
+dma_rx_fifo 
+dma_rx_fifo_inst
+(
     .rst          (rx_fifo1_reset),        // input rst
     .wr_clk       (clk),                   // input wr_clk
     .rd_clk       (rx_fifo_rd_clk),        // input rd_clk
@@ -1552,11 +1556,12 @@ module sata_transport (
     .almost_empty (),
     .prog_full    (rcv_fifo_prog_full),    // output prog_full
     .rd_data_count()
-  ); 
+); 
   
-  
-  //General Transmit FIFO
-  TX_FIFO TL_LL_TX_FIFO (
+//General Transmit FIFO
+general_fifo 
+general_fifo_inst 
+(
     .clk          (clk),                     // input clk
     .rst          (tl_ll_tx_fifo_reset),     // input rst
     .din          (data_link_out_int),       // input [31 : 0] din
@@ -1567,11 +1572,9 @@ module sata_transport (
     .empty        (tl_ll_tx_fifo_empty),     // output empty 
     .almost_full  (),                        // output prog_full
     .almost_empty (tl_ll_tx_fifo_almost_empty) // output prog_empty
-  );
+);
 
-  assign FRAME_END_T  = tl_ll_tx_fifo_empty;
-  assign DATA_RDY_T   = !tl_ll_tx_fifo_almost_empty;
-
-
+assign FRAME_END_T  = tl_ll_tx_fifo_empty;
+assign DATA_RDY_T   = !tl_ll_tx_fifo_almost_empty;
             
 endmodule

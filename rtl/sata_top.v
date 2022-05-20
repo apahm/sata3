@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module SATA_CONTROLLER#(
+module sata_top#(
     parameter integer CHIPSCOPE = 0
 )
 (
@@ -109,8 +109,8 @@ module SATA_CONTROLLER#(
   assign R_ERR         = r_err_t;
   assign ILLEGAL_STATE = illegal_state_t;
   
-  sata_phy 
-  sata_phy_inst 
+  sata_phy_layer 
+  sata_phy_layer_inst 
   (
     .TILE0_REFCLK_PAD_P_IN  (TILE0_REFCLK_PAD_P_IN),
     .TILE0_REFCLK_PAD_N_IN  (TILE0_REFCLK_PAD_N_IN),
@@ -137,10 +137,10 @@ module SATA_CONTROLLER#(
   
   assign LINKUP = linkup_int; 
   
-  link_layer #(
+  sata_link_layer #(
     .CHIPSCOPE        (CHIPSCOPE)
     )
-  link_layer_32bit(
+  sata_link_layer_inst(
     .clk              (clk),
     .rst              (logic_reset),
     .data_in_p        (phy_rx_data_out),
@@ -184,7 +184,9 @@ module SATA_CONTROLLER#(
   
   assign DMA_TERMINATED = tx_termn_t_o;  
 
-  sata_transport TRANSPORT (
+sata_transport 
+sata_transport_isnt 
+(
     .clk                      (clk), 
     .reset                    (logic_reset), 
     .DMA_RQST                 (DMA_RQST), 

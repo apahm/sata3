@@ -1,5 +1,5 @@
 `timescale 1 ns / 1 ps
-`include "../sata_link/defines.h"
+`include "defines.vh"
 
 module out_of_band (
     input   wire            clk,                  // Clock

@@ -469,28 +469,6 @@ out_of_band_inst
     .gtx_rx_reset_out   ()
 );
 
-speed_neg_control 
-speed_neg_control_inst
-(
-    .clk                (),
-    .reset              (),
-    .mgt_reset          (),
-    .linkup             (),
-    .daddr              (),                       
-    .den                (),
-    .di                 (),   
-    .do                 (),     
-    .drdy               (),
-    .dwe                (),
-    .gtx_lock           (),
-    .state_out          (), 
-    .gen_value          (),
-    .gt0_txresetdone_i  (),
-    .gt0_rxresetdone_i  ()
-);
-
-//------------ Debug Signals assignment  --------------------
-
 //------------ optional Ports assignments --------------
 assign  gt0_txcominit_i                      =  0;
 assign  gt0_txcomsas_i                       =  0;

@@ -17,7 +17,6 @@ SYN_FILES += rtl/sata_phy_layer.v
 SYN_FILES += rtl/sata_top.v
 SYN_FILES += rtl/sata_transport.v
 SYN_FILES += rtl/scrambler.v
-SYN_FILES += rtl/defines.vh
 
 # XDC files
 XDC_FILES = fpga.xdc

@@ -20,11 +20,11 @@
            
 data_in_p(data_in_p_int)    data_out_t_int  data_crc_out_rx
 ******************************************************************************/
-`include "defines.v"
+`include "defines.vh"
 
 `timescale 1ns / 1ps
 
-module link_layer#(
+module sata_link_layer#(
     parameter integer CHIPSCOPE = 0
     )
     (

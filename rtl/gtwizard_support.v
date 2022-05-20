@@ -278,8 +278,8 @@ assign  gt0_rxusrclk_out = gt0_rxusrclk_i;
 assign  gt0_rxusrclk2_out = gt0_rxusrclk2_i;
 
 
-gtwizard_GT_USRCLK_SOURCE 
-gt_usrclk_source
+gtwizard_gt_usrclk_source 
+gt_usrclk_source_inst
 (
     .GT0_TXUSRCLK_OUT    (gt0_txusrclk_i),
     .GT0_TXUSRCLK2_OUT   (gt0_txusrclk2_i),
@@ -313,8 +313,7 @@ common0_i
 
 );
 
-gtwizard_common_reset # 
-(
+gtwizard_common_reset #(
       .STABLE_CLOCK_PERIOD (STABLE_CLOCK_PERIOD)        // Period of the stable clock driving this state-machine, unit is [ns]
 )
 common_reset_i

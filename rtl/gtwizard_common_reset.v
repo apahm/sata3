@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `define DLY #1
 
-module gtwizard_0_common_reset #(
+module gtwizard_common_reset #(
     parameter     STABLE_CLOCK_PERIOD      = 8        // Period of the stable clock driving this state-machine, unit is [ns]
 )
 (    
