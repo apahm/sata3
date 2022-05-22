@@ -43,75 +43,122 @@ module sata_top#(
     output          DMA_DATA_RCV_ERROR,           // indicates error during DMA data receive operation
     input           OOB_reset_IN,
     input           RX_FSM_reset_IN,
-    input           TX_FSM_reset_IN    
+    input           TX_FSM_reset_IN,
+
+    input   wire                                    s00_axi_aclk,
+    input   wire                                    s00_axi_aresetn,
+    input   wire [AXI_ADDR_WIDTH-1 : 0]             s00_axi_awaddr,
+    input   wire [2 : 0]                            s00_axi_awprot,
+    input   wire                                    s00_axi_awvalid,
+    output  wire                                    s00_axi_awready,
+    input   wire [AXI_DATA_WIDTH-1 : 0]             s00_axi_wdata,
+    input   wire [(AXI_DATA_WIDTH/8)-1 : 0]         s00_axi_wstrb,
+    input   wire                                    s00_axi_wvalid,
+    output  wire                                    s00_axi_wready,
+    output  wire [1 : 0]                            s00_axi_bresp,
+    output  wire                                    s00_axi_bvalid,
+    input   wire                                    s00_axi_bready,
+    input   wire [AXI_ADDR_WIDTH-1 : 0]             s00_axi_araddr,
+    input   wire [2 : 0]                            s00_axi_arprot,
+    input   wire                                    s00_axi_arvalid,
+    output  wire                                    s00_axi_arready,
+    output  wire [AXI_DATA_WIDTH-1 : 0]             s00_axi_rdata,
+    output  wire [1 : 0]                            s00_axi_rresp,
+    output  wire                                    s00_axi_rvalid,
+    input   wire                                    s00_axi_rready    
 );
 
  
-  wire  [31:0]  phy_rx_data_out;
-  wire  [3:0]   phy_rx_charisk_out;
-  wire  [31:0]  link_tx_data_out;
-  wire          link_tx_charisk_out;
-  wire          linkup_int;
-  wire          logic_reset;
-  wire  [1:0]   align_count;
-  wire          clk;
+wire  [31:0]  phy_rx_data_out;
+wire  [3:0]   phy_rx_charisk_out;
+wire  [31:0]  link_tx_data_out;
+wire          link_tx_charisk_out;
+wire          linkup_int;
+wire          logic_reset;
+wire  [1:0]   align_count;
+wire          clk;
   
-  //wire  for link layer
-  wire  [31:0]  trnsp_tx_data_out;
-  wire  [31:0]  link_rx_data_out;
-  wire          pmreq_p_t;
-  wire          pmreq_s_t;
-  wire          pm_en;
-  wire          lreset;
-  wire          data_rdy_t;
-  wire          phy_detect_t;
-  wire          illegal_state_t;
-  wire          escapecf_t;
-  wire          frame_end_t;
-  wire          decerr;
-  wire          tx_termn_t_o;
-  wire          rx_fifo_rdy;
-  wire          rx_fail_t;
-  wire          crc_err_t;
-  wire          valid_crc_t;
-  wire          fis_err;
-  wire          good_status_t;
-  wire          unrecgnzd_fis_t;
-  //wire          tx_termn_t_i;
-  wire          r_ok_t;
-  wire          r_err_t;
-  wire          sof_t;
-  wire          eof_t;
-  wire          tx_rdy_ack_t;
-  wire          data_out_vld_t;
-  wire          r_ok_sent_t;
+//wire  for link layer
+wire  [31:0]  trnsp_tx_data_out;
+wire  [31:0]  link_rx_data_out;
+wire          pmreq_p_t;
+wire          pmreq_s_t;
+wire          pm_en;
+wire          lreset;
+wire          data_rdy_t;
+wire          phy_detect_t;
+wire          illegal_state_t;
+wire          escapecf_t;
+wire          frame_end_t;
+wire          decerr;
+wire          tx_termn_t_o;
+wire          rx_fifo_rdy;
+wire          rx_fail_t;
+wire          crc_err_t;
+wire          valid_crc_t;
+wire          fis_err;
+wire          good_status_t;
+wire          unrecgnzd_fis_t;
+//wire          tx_termn_t_i;
+wire          r_ok_t;
+wire          r_err_t;
+wire          sof_t;
+wire          eof_t;
+wire          tx_rdy_ack_t;
+wire          data_out_vld_t;
+wire          r_ok_sent_t;
   
-  //for transport layer
-  wire          dma_init;
-  wire          dma_end;
-  wire          stop_dma;
-  wire          rx_fifo_empty;
-  wire          hold_L;
-  wire          cmd_done;
-  wire          dma_tx_fifo_full;
-  wire          dma_rx_fifo_empty;
+//for transport layer
+wire          dma_init;
+wire          dma_end;
+wire          stop_dma;
+wire          rx_fifo_empty;
+wire          hold_L;
+wire          cmd_done;
+wire          dma_tx_fifo_full;
+wire          dma_rx_fifo_empty;
   
-  
-  wire          data_in_rd_en_t;
-  wire          x_rdy_sent_t;
-  wire          tx_rdy_t;
+wire          data_in_rd_en_t;
+wire          x_rdy_sent_t;
+wire          tx_rdy_t;
  
+sata_control #( 
+    .C_S_AXI_DATA_WIDTH(32),
+    .C_S_AXI_ADDR_WIDTH(5)
+) 
+sata_control_inst 
+(
+    .S_AXI_ACLK(s00_axi_aclk),
+    .S_AXI_ARESETN(s00_axi_aresetn),
+    .S_AXI_AWADDR(s00_axi_awaddr),
+    .S_AXI_AWPROT(s00_axi_awprot),
+    .S_AXI_AWVALID(s00_axi_awvalid),
+    .S_AXI_AWREADY(s00_axi_awready),
+    .S_AXI_WDATA(s00_axi_wdata),
+    .S_AXI_WSTRB(s00_axi_wstrb),
+    .S_AXI_WVALID(s00_axi_wvalid),
+    .S_AXI_WREADY(s00_axi_wready),
+    .S_AXI_BRESP(s00_axi_bresp),
+    .S_AXI_BVALID(s00_axi_bvalid),
+    .S_AXI_BREADY(s00_axi_bready),
+    .S_AXI_ARADDR(s00_axi_araddr),
+    .S_AXI_ARPROT(s00_axi_arprot),
+    .S_AXI_ARVALID(s00_axi_arvalid),
+    .S_AXI_ARREADY(s00_axi_arready),
+    .S_AXI_RDATA(s00_axi_rdata),
+    .S_AXI_RRESP(s00_axi_rresp),
+    .S_AXI_RVALID(s00_axi_rvalid),
+    .S_AXI_RREADY(s00_axi_rready)
+);
 
-
+assign CLK_OUT       = clk;
+assign RESET_OUT     = logic_reset;
+assign R_ERR         = r_err_t;
+assign ILLEGAL_STATE = illegal_state_t;
   
-  assign CLK_OUT       = clk;
-  assign RESET_OUT     = logic_reset;
-  assign R_ERR         = r_err_t;
-  assign ILLEGAL_STATE = illegal_state_t;
-  
-  sata_phy_layer 
-  sata_phy_layer_inst 
-  (
+sata_phy_layer 
+sata_phy_layer_inst 
+(
     .TILE0_REFCLK_PAD_P_IN  (TILE0_REFCLK_PAD_P_IN),
     .TILE0_REFCLK_PAD_N_IN  (TILE0_REFCLK_PAD_N_IN),
     .GTXRESET_IN            (GTPRESET_IN),
@@ -132,15 +179,13 @@ module sata_top#(
     .OOB_reset_IN           (OOB_reset_IN),
     .RX_FSM_reset_IN        (RX_FSM_reset_IN),
 	.TX_FSM_reset_IN        (TX_FSM_reset_IN)    
-    
-	);
+);
   
-  assign LINKUP = linkup_int; 
+assign LINKUP = linkup_int; 
   
-  sata_link_layer #(
-    .CHIPSCOPE        (CHIPSCOPE)
-    )
-  sata_link_layer_inst(
+sata_link_layer
+sata_link_layer_inst
+(
     .clk              (clk),
     .rst              (logic_reset),
     .data_in_p        (phy_rx_data_out),
@@ -180,9 +225,9 @@ module sata_top#(
     .data_in_rd_en_t  (data_in_rd_en_t),
     .X_RDY_SENT_T     (x_rdy_sent_t),
     .DMA_TERMINATED   ()
-  );
+);
   
-  assign DMA_TERMINATED = tx_termn_t_o;  
+assign DMA_TERMINATED = tx_termn_t_o;  
 
 sata_transport 
 sata_transport_isnt 
