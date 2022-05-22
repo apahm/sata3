@@ -1,71 +1,73 @@
 `timescale 1ns / 1ps
 
 module sata_top#(
-    parameter integer CHIPSCOPE = 0
+    parameter integer CHIPSCOPE = 0,
+    parameter integer AXI_DATA_WIDTH = 32,
+    parameter integer AXI_DATA_WIDTH = 5
 )
 (
-    input           TILE0_REFCLK_PAD_P_IN,       // Input differential clock pin P 150MHZ 
-    input           TILE0_REFCLK_PAD_N_IN,       // Input differential clock pin N 150MHZ
-    input           GTPRESET_IN,                 // Reset input for GTP initialization
-    output          TILE0_PLLLKDET_OUT,          // GTP PLL Lock detected output
+    input   wire            TILE0_REFCLK_PAD_P_IN,       // Input differential clock pin P 150MHZ 
+    input   wire            TILE0_REFCLK_PAD_N_IN,       // Input differential clock pin N 150MHZ
+    input   wire            GTPRESET_IN,                 // Reset input for GTP initialization
+    output  wire            TILE0_PLLLKDET_OUT,          // GTP PLL Lock detected output
 
-    output          TXP0_OUT,                    // SATA Connector TX P pin
-    output          TXN0_OUT,                    // SATA Connector TX N pin
-    input           RXP0_IN,                     // SATA Connector RX P pin
-    input           RXN0_IN,                     // SATA Connector RX N pin
+    output  wire            TXP0_OUT,                    // SATA Connector TX P pin
+    output  wire            TXN0_OUT,                    // SATA Connector TX N pin
+    input   wire            RXP0_IN,                     // SATA Connector RX P pin
+    input   wire            RXN0_IN,                     // SATA Connector RX N pin
       
-    output          DCMLOCKED_OUT,               // PHY Layer DCM locked
-    output          LINKUP,                      // SATA PHY initialisation completed LINK UP
-    output [1:0]    GEN,                         // 2 when a SATA3, 1 when a SATA2 device detected, 0 when SATA1 device detected
-    output          CLK_OUT,                     // LINK and Transport Layer clock out CLK_OUT = PHY_CLK_OUT / 2
-    input           HOST_READ_EN,                // Read enable from host / user logic for Shadow register and PIO data
-    input           HOST_WRITE_EN,               // Write enable from host / user logic for Shadow register and PIO data
-    input  [4:0]    HOST_ADDR_REG,               // Address bus for Shadow register
-    input  [31:0]   HOST_DATA_IN,                // Data in bus for Shadow register and PIO data
-    output [31:0]   HOST_DATA_OUT,               // Data out bus for Shadow register and PIO data
-    output          RESET_OUT,                   // Reset out for User logic this is from GTP reset out
-    output          WRITE_HOLD_U,                // Write HOLD signal for PIO and DMA write
-    output          READ_HOLD_U,                 // Read HOLD signal for PIO and DMA read
-    input           PIO_CLK_IN,                  // Clock in for PIO read / write
-    input           DMA_CLK_IN,                  // Clock in for DMA read / write
-    input           DMA_RQST,                    // DMA request. This should be 1 for DMA operation and 0 for PIO operation
-    output   [31:0] DMA_RX_DATA_OUT,             // DMA read data out bus
-    input           DMA_RX_REN,                  // DMA read enable
-    input    [31:0] DMA_TX_DATA_IN,              // DMA write data in bus
-    input           DMA_TX_WEN,                  // DMA write enable
-    input           CE,                          // Chip enable
-    output          IPF,                         // Interrupt pending flag
-    output          DMA_TERMINATED,              // This signal becomes 1 when a DMA terminate primitive get from Device (SSD)
-    output          R_ERR,                       // set 1 when R_ERR Primitive received from disk 
-    output          ILLEGAL_STATE,               // set 1 when illegal_state transition detected
-    input           RX_FIFO_RESET,               // reset signal for Receive data fifo
-    input           TX_FIFO_RESET,               // reset signal for Transmit data fifo
-    output          DMA_DATA_RCV_ERROR,           // indicates error during DMA data receive operation
-    input           OOB_reset_IN,
-    input           RX_FSM_reset_IN,
-    input           TX_FSM_reset_IN,
+    output  wire            DCMLOCKED_OUT,               // PHY Layer DCM locked
+    output  wire            LINKUP,                      // SATA PHY initialisation completed LINK UP
+    output  wire [1:0]      GEN,                         // 2 when a SATA3, 1 when a SATA2 device detected, 0 when SATA1 device detected
+    output  wire            CLK_OUT,                     // LINK and Transport Layer clock out CLK_OUT = PHY_CLK_OUT / 2
+    input   wire            HOST_READ_EN,                // Read enable from host / user logic for Shadow register and PIO data
+    input   wire            HOST_WRITE_EN,               // Write enable from host / user logic for Shadow register and PIO data
+    input   wire [4:0]      HOST_ADDR_REG,               // Address bus for Shadow register
+    input   wire [31:0]     HOST_DATA_IN,                // Data in bus for Shadow register and PIO data
+    output  wire [31:0]     HOST_DATA_OUT,               // Data out bus for Shadow register and PIO data
+    output  wire            RESET_OUT,                   // Reset out for User logic this is from GTP reset out
+    output  wire            WRITE_HOLD_U,                // Write HOLD signal for PIO and DMA write
+    output  wire            READ_HOLD_U,                 // Read HOLD signal for PIO and DMA read
+    input   wire            PIO_CLK_IN,                  // Clock in for PIO read / write
+    input   wire            DMA_CLK_IN,                  // Clock in for DMA read / write
+    input   wire            DMA_RQST,                    // DMA request. This should be 1 for DMA operation and 0 for PIO operation
+    output  wire [31:0]     DMA_RX_DATA_OUT,             // DMA read data out bus
+    input   wire            DMA_RX_REN,                  // DMA read enable
+    input   wire [31:0]     DMA_TX_DATA_IN,              // DMA write data in bus
+    input   wire            DMA_TX_WEN,                  // DMA write enable
+    input   wire            CE,                          // Chip enable
+    output  wire            IPF,                         // Interrupt pending flag
+    output  wire            DMA_TERMINATED,              // This signal becomes 1 when a DMA terminate primitive get from Device (SSD)
+    output  wire            R_ERR,                       // set 1 when R_ERR Primitive received from disk 
+    output  wire            ILLEGAL_STATE,               // set 1 when illegal_state transition detected
+    input   wire            RX_FIFO_RESET,               // reset signal for Receive data fifo
+    input   wire            TX_FIFO_RESET,               // reset signal for Transmit data fifo
+    output  wire            DMA_DATA_RCV_ERROR,           // indicates error during DMA data receive operation
+    input   wire            OOB_reset_IN,
+    input   wire            RX_FSM_reset_IN,
+    input   wire            TX_FSM_reset_IN,
 
-    input   wire                                    s00_axi_aclk,
-    input   wire                                    s00_axi_aresetn,
-    input   wire [AXI_ADDR_WIDTH-1 : 0]             s00_axi_awaddr,
-    input   wire [2 : 0]                            s00_axi_awprot,
-    input   wire                                    s00_axi_awvalid,
-    output  wire                                    s00_axi_awready,
-    input   wire [AXI_DATA_WIDTH-1 : 0]             s00_axi_wdata,
-    input   wire [(AXI_DATA_WIDTH/8)-1 : 0]         s00_axi_wstrb,
-    input   wire                                    s00_axi_wvalid,
-    output  wire                                    s00_axi_wready,
-    output  wire [1 : 0]                            s00_axi_bresp,
-    output  wire                                    s00_axi_bvalid,
-    input   wire                                    s00_axi_bready,
-    input   wire [AXI_ADDR_WIDTH-1 : 0]             s00_axi_araddr,
-    input   wire [2 : 0]                            s00_axi_arprot,
-    input   wire                                    s00_axi_arvalid,
-    output  wire                                    s00_axi_arready,
-    output  wire [AXI_DATA_WIDTH-1 : 0]             s00_axi_rdata,
-    output  wire [1 : 0]                            s00_axi_rresp,
-    output  wire                                    s00_axi_rvalid,
-    input   wire                                    s00_axi_rready    
+    input   wire                            axi_lite_aclk,
+    input   wire                            axi_lite_aresetn,
+    input   wire [AXI_ADDR_WIDTH-1 : 0]     axi_lite_awaddr,
+    input   wire [2 : 0]                    axi_lite_awprot,
+    input   wire                            axi_lite_awvalid,
+    output  wire                            axi_lite_awready,
+    input   wire [AXI_DATA_WIDTH-1 : 0]     axi_lite_wdata,
+    input   wire [(AXI_DATA_WIDTH/8)-1 : 0] axi_lite_wstrb,
+    input   wire                            axi_lite_wvalid,
+    output  wire                            axi_lite_wready,
+    output  wire [1 : 0]                    axi_lite_bresp,
+    output  wire                            axi_lite_bvalid,
+    input   wire                            axi_lite_bready,
+    input   wire [AXI_ADDR_WIDTH-1 : 0]     axi_lite_araddr,
+    input   wire [2 : 0]                    axi_lite_arprot,
+    input   wire                            axi_lite_arvalid,
+    output  wire                            axi_lite_arready,
+    output  wire [AXI_DATA_WIDTH-1 : 0]     axi_lite_rdata,
+    output  wire [1 : 0]                    axi_lite_rresp,
+    output  wire                            axi_lite_rvalid,
+    input   wire                            axi_lite_rready    
 );
 
  
@@ -128,27 +130,27 @@ sata_control #(
 ) 
 sata_control_inst 
 (
-    .S_AXI_ACLK(s00_axi_aclk),
-    .S_AXI_ARESETN(s00_axi_aresetn),
-    .S_AXI_AWADDR(s00_axi_awaddr),
-    .S_AXI_AWPROT(s00_axi_awprot),
-    .S_AXI_AWVALID(s00_axi_awvalid),
-    .S_AXI_AWREADY(s00_axi_awready),
-    .S_AXI_WDATA(s00_axi_wdata),
-    .S_AXI_WSTRB(s00_axi_wstrb),
-    .S_AXI_WVALID(s00_axi_wvalid),
-    .S_AXI_WREADY(s00_axi_wready),
-    .S_AXI_BRESP(s00_axi_bresp),
-    .S_AXI_BVALID(s00_axi_bvalid),
-    .S_AXI_BREADY(s00_axi_bready),
-    .S_AXI_ARADDR(s00_axi_araddr),
-    .S_AXI_ARPROT(s00_axi_arprot),
-    .S_AXI_ARVALID(s00_axi_arvalid),
-    .S_AXI_ARREADY(s00_axi_arready),
-    .S_AXI_RDATA(s00_axi_rdata),
-    .S_AXI_RRESP(s00_axi_rresp),
-    .S_AXI_RVALID(s00_axi_rvalid),
-    .S_AXI_RREADY(s00_axi_rready)
+    .S_AXI_ACLK             (axi_lite_aclk),
+    .S_AXI_ARESETN          (axi_lite_aresetn),
+    .S_AXI_AWADDR           (axi_lite_awaddr),
+    .S_AXI_AWPROT           (axi_lite_awprot),
+    .S_AXI_AWVALID          (axi_lite_awvalid),
+    .S_AXI_AWREADY          (axi_lite_awready),
+    .S_AXI_WDATA            (axi_lite_wdata),
+    .S_AXI_WSTRB            (axi_lite_wstrb),
+    .S_AXI_WVALID           (axi_lite_wvalid),
+    .S_AXI_WREADY           (axi_lite_wready),
+    .S_AXI_BRESP            (axi_lite_bresp),
+    .S_AXI_BVALID           (axi_lite_bvalid),
+    .S_AXI_BREADY           (axi_lite_bready),
+    .S_AXI_ARADDR           (axi_lite_araddr),
+    .S_AXI_ARPROT           (axi_lite_arprot),
+    .S_AXI_ARVALID          (axi_lite_arvalid),
+    .S_AXI_ARREADY          (axi_lite_arready),
+    .S_AXI_RDATA            (axi_lite_rdata),
+    .S_AXI_RRESP            (axi_lite_rresp),
+    .S_AXI_RVALID           (axi_lite_rvalid),
+    .S_AXI_RREADY           (axi_lite_rready)
 );
 
 assign CLK_OUT       = clk;
