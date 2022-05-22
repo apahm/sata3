@@ -120,7 +120,6 @@ module gtwizard_0_support #
 );
 
 
-//**************************** Wire Declarations ******************************//
     //------------------------ GT Wrapper Wires ------------------------------
     //________________________________________________________________________
     //________________________________________________________________________
@@ -215,12 +214,12 @@ module gtwizard_0_support #
     //--------------- Transmit Ports - TX Polarity Control Ports ---------------
     wire            gt0_txpolarity_i;
 
-   wire  gt0_qplllock_i;
-   wire  gt0_qpllrefclklost_i  ;
-   wire  gt0_qpllreset_i  ;
-   wire  gt0_qpllreset_t  ;
-   wire  gt0_qplloutclk_i  ;
-   wire  gt0_qplloutrefclk_i ;
+    wire  gt0_qplllock_i;
+    wire  gt0_qpllrefclklost_i  ;
+    wire  gt0_qpllreset_i  ;
+    wire  gt0_qpllreset_t  ;
+    wire  gt0_qplloutclk_i  ;
+    wire  gt0_qplloutrefclk_i ;
 
     //----------------------------- Global Signals -----------------------------
 
@@ -274,55 +273,54 @@ module gtwizard_0_support #
     assign  gt0_rxusrclk2_out = gt0_rxusrclk2_i;
 
 
-gtwizard_gt_usrclk_source 
-gt_usrclk_source
-(
- 
-    .GT0_TXUSRCLK_OUT    (gt0_txusrclk_i),
-    .GT0_TXUSRCLK2_OUT   (gt0_txusrclk2_i),
-    .GT0_TXOUTCLK_IN     (gt0_txoutclk_i),
-    .GT0_RXUSRCLK_OUT    (gt0_rxusrclk_i),
-    .GT0_RXUSRCLK2_OUT   (gt0_rxusrclk2_i),
- 
-    .Q0_CLK1_GTREFCLK_PAD_N_IN  (q0_clk1_gtrefclk_pad_n_in),
-    .Q0_CLK1_GTREFCLK_PAD_P_IN  (q0_clk1_gtrefclk_pad_p_in),
-    .Q0_CLK1_GTREFCLK_OUT       (q0_clk1_refclk_i)
-);
+    gtwizard_gt_usrclk_source 
+    gt_usrclk_source_inst
+    (
+     
+        .GT0_TXUSRCLK_OUT    (gt0_txusrclk_i),
+        .GT0_TXUSRCLK2_OUT   (gt0_txusrclk2_i),
+        .GT0_TXOUTCLK_IN     (gt0_txoutclk_i),
+        .GT0_RXUSRCLK_OUT    (gt0_rxusrclk_i),
+        .GT0_RXUSRCLK2_OUT   (gt0_rxusrclk2_i),
+     
+        .Q0_CLK1_GTREFCLK_PAD_N_IN  (q0_clk1_gtrefclk_pad_n_in),
+        .Q0_CLK1_GTREFCLK_PAD_P_IN  (q0_clk1_gtrefclk_pad_p_in),
+        .Q0_CLK1_GTREFCLK_OUT       (q0_clk1_refclk_i)
+    );
 
-assign  sysclk_in_i = sysclk_in;
-    gtwizard_common #
-  (
-   .WRAPPER_SIM_GTRESET_SPEEDUP(EXAMPLE_SIM_GTRESET_SPEEDUP),
-   .SIM_QPLLREFCLK_SEL(3'b010)
-  )
- common0_i
-   (
-    .QPLLREFCLKSEL_IN(3'b010),
-    .GTREFCLK0_IN(tied_to_ground_i),
-    .GTREFCLK1_IN(q0_clk1_refclk_i),
-    .QPLLLOCK_OUT(gt0_qplllock_i),
-    .QPLLLOCKDETCLK_IN(sysclk_in_i),
-    .QPLLOUTCLK_OUT(gt0_qplloutclk_i),
-    .QPLLOUTREFCLK_OUT(gt0_qplloutrefclk_i),
-    .QPLLREFCLKLOST_OUT(gt0_qpllrefclklost_i),    
-    .QPLLRESET_IN(gt0_qpllreset_t)
+    assign  sysclk_in_i = sysclk_in;
+    
+    gtwizard_common #(
+       .WRAPPER_SIM_GTRESET_SPEEDUP(EXAMPLE_SIM_GTRESET_SPEEDUP),
+       .SIM_QPLLREFCLK_SEL(3'b010)
+    )
+    common_inst
+    (
+        .QPLLREFCLKSEL_IN(3'b010),
+        .GTREFCLK0_IN(tied_to_ground_i),
+        .GTREFCLK1_IN(q0_clk1_refclk_i),
+        .QPLLLOCK_OUT(gt0_qplllock_i),
+        .QPLLLOCKDETCLK_IN(sysclk_in_i),
+        .QPLLOUTCLK_OUT(gt0_qplloutclk_i),
+        .QPLLOUTREFCLK_OUT(gt0_qplloutrefclk_i),
+        .QPLLREFCLKLOST_OUT(gt0_qpllrefclklost_i),    
+        .QPLLRESET_IN(gt0_qpllreset_t)
+    );
 
-);
-
-    gtwizard_common_reset # 
-   (
-      .STABLE_CLOCK_PERIOD (STABLE_CLOCK_PERIOD)        // Period of the stable clock driving this state-machine, unit is [ns]
-   )
-   common_reset_i
-   (    
-      .STABLE_CLOCK(sysclk_in_i),             //Stable Clock, either a stable clock from the PCB
-      .SOFT_RESET(soft_reset_tx_in),               //User Reset, can be pulled any time
-      .COMMON_RESET(commonreset_i)              //Reset QPLL
-   );
+    gtwizard_common_reset #(
+          .STABLE_CLOCK_PERIOD (STABLE_CLOCK_PERIOD)        // Period of the stable clock driving this state-machine, unit is [ns]
+    )
+    common_reset_inst
+    (    
+        .STABLE_CLOCK(sysclk_in_i),             //Stable Clock, either a stable clock from the PCB
+        .SOFT_RESET(soft_reset_tx_in),               //User Reset, can be pulled any time
+        .COMMON_RESET(commonreset_i)              //Reset QPLL
+    );
 
 
     
-    gtwizard_0 gtwizard_0_init_i
+    gtwizard_0 
+    gtwizard_0_inst
     (
         .sysclk_in                      (sysclk_in_i),
         .soft_reset_tx_in               (soft_reset_tx_in),
@@ -434,15 +432,15 @@ assign  sysclk_in_i = sysclk_in;
 
 
 
-    .gt0_qplllock_in(gt0_qplllock_i),
-    .gt0_qpllrefclklost_in(gt0_qpllrefclklost_i),
-    .gt0_qpllreset_out(gt0_qpllreset_i),
-    .gt0_qplloutclk_in(gt0_qplloutclk_i),
-    .gt0_qplloutrefclk_in(gt0_qplloutrefclk_i)
+        .gt0_qplllock_in(gt0_qplllock_i),
+        .gt0_qpllrefclklost_in(gt0_qpllrefclklost_i),
+        .gt0_qpllreset_out(gt0_qpllreset_i),
+        .gt0_qplloutclk_in(gt0_qplloutclk_i),
+        .gt0_qplloutrefclk_in(gt0_qplloutrefclk_i)
     );
 
 
-assign  gt0_txsysclksel_i                    =  2'b11;
+    assign  gt0_txsysclksel_i                    =  2'b11;
 
  
 endmodule
