@@ -8,39 +8,39 @@ module gtwizard_common #
     parameter   SIM_QPLLREFCLK_SEL             =   3'b001     
 )
 (
-    input   wire [2:0]   QPLLREFCLKSEL_IN,
-    input   wire         GTREFCLK0_IN,
-    input   wire         GTREFCLK1_IN,
-    output  wire         QPLLLOCK_OUT,
-    input   wire         QPLLLOCKDETCLK_IN,
-    output  wire         QPLLOUTCLK_OUT,
-    output  wire         QPLLOUTREFCLK_OUT,
-    output  wire         QPLLREFCLKLOST_OUT,   
-    input   wire         QPLLRESET_IN
+    input   [2:0]   QPLLREFCLKSEL_IN,
+    input           GTREFCLK0_IN,
+    input           GTREFCLK1_IN,
+    output          QPLLLOCK_OUT,
+    input           QPLLLOCKDETCLK_IN,
+    output          QPLLOUTCLK_OUT,
+    output          QPLLOUTREFCLK_OUT,
+    output          QPLLREFCLKLOST_OUT,   
+    input           QPLLRESET_IN
 );
 
 
 
 //***************************** Parameter Declarations ************************
-    localparam QPLL_FBDIV_TOP =  16;
+    localparam QPLL_FBDIV_TOP =  40;
 
     localparam QPLL_FBDIV_IN  =  (QPLL_FBDIV_TOP == 16)  ? 10'b0000100000 : 
-				(QPLL_FBDIV_TOP == 20)  ? 10'b0000110000 :
-				(QPLL_FBDIV_TOP == 32)  ? 10'b0001100000 :
-				(QPLL_FBDIV_TOP == 40)  ? 10'b0010000000 :
-				(QPLL_FBDIV_TOP == 64)  ? 10'b0011100000 :
-				(QPLL_FBDIV_TOP == 66)  ? 10'b0101000000 :
-				(QPLL_FBDIV_TOP == 80)  ? 10'b0100100000 :
-				(QPLL_FBDIV_TOP == 100) ? 10'b0101110000 : 10'b0000000000;
+                (QPLL_FBDIV_TOP == 20)  ? 10'b0000110000 :
+                (QPLL_FBDIV_TOP == 32)  ? 10'b0001100000 :
+                (QPLL_FBDIV_TOP == 40)  ? 10'b0010000000 :
+                (QPLL_FBDIV_TOP == 64)  ? 10'b0011100000 :
+                (QPLL_FBDIV_TOP == 66)  ? 10'b0101000000 :
+                (QPLL_FBDIV_TOP == 80)  ? 10'b0100100000 :
+                (QPLL_FBDIV_TOP == 100) ? 10'b0101110000 : 10'b0000000000;
 
    localparam QPLL_FBDIV_RATIO = (QPLL_FBDIV_TOP == 16)  ? 1'b1 : 
-				(QPLL_FBDIV_TOP == 20)  ? 1'b1 :
-				(QPLL_FBDIV_TOP == 32)  ? 1'b1 :
-				(QPLL_FBDIV_TOP == 40)  ? 1'b1 :
-				(QPLL_FBDIV_TOP == 64)  ? 1'b1 :
-				(QPLL_FBDIV_TOP == 66)  ? 1'b0 :
-				(QPLL_FBDIV_TOP == 80)  ? 1'b1 :
-				(QPLL_FBDIV_TOP == 100) ? 1'b1 : 1'b1;
+                (QPLL_FBDIV_TOP == 20)  ? 1'b1 :
+                (QPLL_FBDIV_TOP == 32)  ? 1'b1 :
+                (QPLL_FBDIV_TOP == 40)  ? 1'b1 :
+                (QPLL_FBDIV_TOP == 64)  ? 1'b1 :
+                (QPLL_FBDIV_TOP == 66)  ? 1'b0 :
+                (QPLL_FBDIV_TOP == 80)  ? 1'b1 :
+                (QPLL_FBDIV_TOP == 100) ? 1'b1 : 1'b1;
 
     // ground and vcc signals
 wire            tied_to_ground_i;
@@ -114,7 +114,7 @@ wire    [63:0]  tied_to_vcc_vec_i;
         .QPLLLOCKDETCLK                 (QPLLLOCKDETCLK_IN),
         .QPLLLOCKEN                     (tied_to_vcc_i),
         .QPLLOUTRESET                   (tied_to_ground_i),
-        .QPLLPD                         (tied_to_vcc_i),
+        .QPLLPD                         (tied_to_ground_i),
         .QPLLREFCLKLOST                 (QPLLREFCLKLOST_OUT),
         .QPLLREFCLKSEL                  (QPLLREFCLKSEL_IN),
         .QPLLRESET                      (QPLLRESET_IN),

@@ -2,16 +2,16 @@
 
 module gtwizard_gt_usrclk_source 
 (
-    output wire  GT0_TXUSRCLK_OUT,
-    output wire  GT0_TXUSRCLK2_OUT,
-    input  wire  GT0_TXOUTCLK_IN,
-    output wire  GT0_RXUSRCLK_OUT,
-    output wire  GT0_RXUSRCLK2_OUT,
-    input  wire  GT0_RXOUTCLK_IN,
+    output          GT0_TXUSRCLK_OUT,
+    output          GT0_TXUSRCLK2_OUT,
+    input           GT0_TXOUTCLK_IN,
+    output          GT0_RXUSRCLK_OUT,
+    output          GT0_RXUSRCLK2_OUT,
     input  wire  Q0_CLK1_GTREFCLK_PAD_N_IN,
     input  wire  Q0_CLK1_GTREFCLK_PAD_P_IN,
     output wire  Q0_CLK1_GTREFCLK_OUT
 );
+
 
 `define DLY #1
 
@@ -20,11 +20,9 @@ module gtwizard_gt_usrclk_source
     wire            tied_to_vcc_i;
  
     wire            gt0_txoutclk_i; 
-    wire            gt0_rxoutclk_i;
     wire  q0_clk1_gtrefclk /*synthesis syn_noclockbuf=1*/;
 
     wire            gt0_txusrclk_i;
-    wire            gt0_rxusrclk_i;
 
 
 //*********************************** Beginning of Code *******************************
@@ -33,7 +31,6 @@ module gtwizard_gt_usrclk_source
     assign tied_to_ground_i             = 1'b0;
     assign tied_to_vcc_i                = 1'b1;
     assign gt0_txoutclk_i = GT0_TXOUTCLK_IN;
-    assign gt0_rxoutclk_i = GT0_RXOUTCLK_IN;
      
     assign Q0_CLK1_GTREFCLK_OUT = q0_clk1_gtrefclk;
 
@@ -59,18 +56,11 @@ module gtwizard_gt_usrclk_source
     );
 
 
-    BUFG rxoutclk_bufg1_i
-    (
-        .I                              (gt0_rxoutclk_i),
-        .O                              (gt0_rxusrclk_i)
-    );
-
-
 
  
 assign GT0_TXUSRCLK_OUT = gt0_txusrclk_i;
 assign GT0_TXUSRCLK2_OUT = gt0_txusrclk_i;
-assign GT0_RXUSRCLK_OUT = gt0_rxusrclk_i;
-assign GT0_RXUSRCLK2_OUT = gt0_rxusrclk_i;
+assign GT0_RXUSRCLK_OUT = gt0_txusrclk_i;
+assign GT0_RXUSRCLK2_OUT = gt0_txusrclk_i;
 
 endmodule

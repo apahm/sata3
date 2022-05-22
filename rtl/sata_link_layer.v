@@ -91,15 +91,10 @@ module sata_link_layer #(
 	reg unscrmb_rst           ;
 	reg hold_arrived;
 	
-	wire CRC_cal_ip_tx        ;                  // CRC calculation is in progress during txn...
-
-
-	wire rx_charisk_out       ;
-	wire rxelecidle_out       ;                                                            
-	wire sata_user_clk        ; 
-	//wire tx_charisk_out     ;                                                            
+	wire rx_charisk_out;
+	wire rxelecidle_out;                                                            
+	wire sata_user_clk; 
 																																												 
-	//added by Shameer  
 	wire [31:0] data_in_p_int; //for CONT primitive handling
 	reg         cont_flag;
 	reg         crc_rx_rst;
