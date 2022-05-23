@@ -30,7 +30,7 @@ module out_of_band (
     input   wire            gt0_rxresetdone_i,    // rx fsm reaet done
     input   wire            gt0_txresetdone_i,    // tx fsm reset done
     
-    output reg              linkup,               // SATA link is established
+    output  wire            linkup,               // SATA link is established
     output reg              gtx_rx_reset_out      // rx reset out
 );
   
@@ -48,7 +48,7 @@ parameter [3:0]
     LINK_READY                  = 4'hB;
 
   
-    reg [3:0]   CurrentState, NextState;                               
+    (*mark_debug = "TRUE" *) reg [3:0]   CurrentState, NextState;                               
     reg [7:0]   count160;                                               
     reg [17:0]  count;                                                  
     reg [4:0]   count160_round;                                         
@@ -60,7 +60,7 @@ parameter [3:0]
     reg         txelecidle_r;                                           
     reg         count160_done, count160_go;                             
     reg [1:0]   align_count;                                            
-    reg         linkup_r;                                               
+    (*mark_debug = "TRUE" *) reg         linkup_r;                                               
     reg         rxreset;                                                
     reg [31:0]  rx_datain_r1;
     reg [31:0]  tx_datain_r1, tx_datain_r2, tx_datain_r3, tx_datain_r4; // TX data registers
@@ -83,6 +83,7 @@ parameter [3:0]
     wire        sof_det, eof_det;
     wire        align_cnt_en;
     
+
     wire  [3:0] CurrentState_out;     // Current state for Chipscope
     wire        align_det_out;        // ALIGN primitive detected
     wire        sync_det_out;         // SYNC primitive detected
@@ -236,18 +237,16 @@ always @ (CurrentState or count or cominitdet or comwakedet or rxelecidle or rx_
       end       
     end
     
-    HOST_SEND_ALIGN : //7
-    begin
-      send_align_r = 1'b1;
-      txelecidle_r = 1'b0;
-      if (sync_det) // SYNC detected
-      begin
-        send_align_r = 1'b0;
-        gtx_rx_reset_out = 1'b1;
-        NextState    = LINK_READY; //CHECK_RX_MAN_RST; 
-      end
-      else
-        NextState = HOST_SEND_ALIGN;
+    HOST_SEND_ALIGN : begin
+        send_align_r = 1'b1;
+        txelecidle_r = 1'b0;
+        if (sync_det) begin
+            send_align_r = 1'b0;
+            gtx_rx_reset_out = 1'b1;
+            NextState    = LINK_READY; //CHECK_RX_MAN_RST; 
+        end
+        else
+            NextState = HOST_SEND_ALIGN;
     end
    
     LINK_READY : // 8
@@ -475,7 +474,7 @@ assign  txcominit             = txcominit_r;
 assign  txcomwake             = txcomwake_r;
 assign  txelecidle            = txelecidle_r;
 assign  align_cnt_en          = ~send_d10_2_r;
-//assign linkup               = linkup_r; 
+assign  linkup                = linkup_r; 
 assign  CurrentState_out      = CurrentState;
 assign  align_det_out         = align_det;
 assign  sync_det_out          = sync_det;

@@ -84,7 +84,7 @@ module sata_transport (
 
  
     
-  -----------------DEVISE/HEAD REGISTER-----------------------------------------
+  -----------------DEVICE/HEAD REGISTER-----------------------------------------
   | 7       |   6   |   5   |   4   |   3   |   2        |  1        |  0      |                    
   | -       |   L   |   -   |   -   |  DEV  |   HS3      |  HS1      |  HS0    |                
   ------------------------------------------------------------------------------
@@ -214,48 +214,48 @@ module sata_transport (
 /*************************states************************************/
 
    
-   parameter HT_HostIdle           =   5'h 0       ;
-   parameter HT_ChkTyp             =   5'h 1       ;
-   parameter HT_CmdFIS             =   5'h 2       ;
-   parameter HT_CntrlFIS           =   5'h 3       ;
-   parameter HT_DMASTUPFIS         =   5'h 4       ;
-   parameter HT_DMASTUPTransStatus =   5'h 5       ;
-   parameter HT_CtrlTransStatus    =   5'h 6       ;
-   parameter HT_PIOOTrans2         =   5'h 7       ;
-   parameter HT_RegFIS             =   5'h 8       ;
-   parameter HT_DB_FIS             =   5'h 9       ;
-   parameter HT_DMA_FIS            =   5'h A      ;
-   parameter HT_PS_FIS             =   5'h B      ;
-   parameter HT_DS_FIS             =   5'h C      ;
-   parameter HT_RcvBIST            =   5'h D      ;
-   parameter HT_DMAITrans          =   5'h E      ;
-   parameter HT_PIOITrans1         =   5'h F      ;
-   parameter HT_CmdTransStatus     =   5'h 10      ;
-   parameter HT_RegTransStatus     =   5'h 11      ;
-   parameter HT_PIOEnd             =   5'h 12      ;
-   parameter HT_PIOOTrans1         =   5'h 13      ;
-   parameter HT_PIOITrans2         =   5'h 14      ;
-   parameter HT_DMAOTrans1         =   5'h 15      ;
-   parameter HT_DMAOTrans2         =   5'h 16      ;
-   parameter HT_DMAEnd             =   5'h 17      ;
-   parameter HT_tl_ll_tx_fifo_rst_delay = 5'h 18;       
+   parameter HT_HostIdle           = 5'h0;
+   parameter HT_ChkTyp             = 5'h1;
+   parameter HT_CmdFIS             = 5'h2;
+   parameter HT_CntrlFIS           = 5'h3;
+   parameter HT_DMASTUPFIS         = 5'h4;
+   parameter HT_DMASTUPTransStatus = 5'h5;
+   parameter HT_CtrlTransStatus    = 5'h6;
+   parameter HT_PIOOTrans2         = 5'h7;
+   parameter HT_RegFIS             = 5'h8;
+   parameter HT_DB_FIS             = 5'h9;
+   parameter HT_DMA_FIS            = 5'hA;
+   parameter HT_PS_FIS             = 5'hB;
+   parameter HT_DS_FIS             = 5'hC;
+   parameter HT_RcvBIST            = 5'hD;
+   parameter HT_DMAITrans          = 5'hE;
+   parameter HT_PIOITrans1         = 5'hF;
+   parameter HT_CmdTransStatus     = 5'h10;
+   parameter HT_RegTransStatus     = 5'h11;
+   parameter HT_PIOEnd             = 5'h12;
+   parameter HT_PIOOTrans1         = 5'h13;
+   parameter HT_PIOITrans2         = 5'h14;
+   parameter HT_DMAOTrans1         = 5'h15;
+   parameter HT_DMAOTrans2         = 5'h16;
+   parameter HT_DMAEnd             = 5'h17;
+   parameter HT_tl_ll_tx_fifo_rst_delay = 5'h18;       
    
 /***************ADDRESS PARAMETER***************************************/
 
 
-   parameter cmd_reg               =  8'd1        ;
-   parameter ctrl_reg              =  8'd2        ;
-   parameter feature_reg           =  8'd3        ;
-   parameter stuts_reg             =  8'd4        ;
-   parameter head_reg              =  8'd5        ;
-   parameter error_reg             =  8'd6        ;
-   parameter lba_low               =  8'd7        ;
-   parameter lba_mid               =  8'd8        ;
-   parameter lba_high              =  8'd9        ;
-   parameter sect_count            =  8'd10       ;
-   parameter data_reg              =  8'd11       ;
+   parameter cmd_reg        =  8'd1;
+   parameter ctrl_reg       =  8'd2;
+   parameter feature_reg    =  8'd3;
+   parameter stuts_reg      =  8'd4;
+   parameter head_reg       =  8'd5;
+   parameter error_reg      =  8'd6;
+   parameter lba_low        =  8'd7;
+   parameter lba_mid        =  8'd8;
+   parameter lba_high       =  8'd9;
+   parameter sect_count     =  8'd10;
+   parameter data_reg       =  8'd11;
    
-   parameter DEVICE_RESET          = 8'h08       ;
+   parameter DEVICE_RESET = 8'h08;
    
    //assign Transfer_cnt_DMA      = sector_count_register;
    assign rx_ren_pio            = (~rcv_fifo_almost_empty);
@@ -629,42 +629,42 @@ module sata_transport (
 
   always @(posedge clk) begin
     if (reset) begin  
-      txr_rdy             <= 1'b0;
-      state               <= HT_HostIdle ;
-      H_read_count        <= 16'd0;
-      rcv_fifo_wr_en      <= 1'b0;
-      data_rcv_fifo       <= 32'd0;
-      data_link_out_int   <= 32'd0;
-      //frame_end_T        <= 1'b0;
-      FIS_ERR             <= 1'b0;
-      UNRECGNZD_FIS_T     <= 1'b0;
-      Good_status_T       <= 1'b0;
-      hold_L              <= 1'b0;
-      recv_pio_dma_cnt    <= 16'd0;
-      count               <= 16'b0;
-      cmd_done            <= 1'd0;
-      prvs_pio            <= 1'b0;
-      fis_reg_DW0         <= 32'b0;
-      fis_reg_DW1         <= 32'b0;
-      fis_reg_DW2         <= 32'b0;
-      fis_reg_DW3         <= 32'b0;
-      fis_reg_DW4         <= 32'b0;
-      fis_reg_DW5         <= 32'b0;
-      fis_reg_DW6         <= 32'b0;
-      fis_count           <= 3'd0;
-      EscapeCF_T          <= 1'b0;
-      //data_rdy_T         <= 1'b0;
-      tl_ll_tx_fifo_reset <= 0;
-      data_link_out_wr_en <= 0;
-      pio_rcv_flag  <= 0;
-      tx_fifo_pio_rd_en   <= 0;
-      temp_status_reg     <= 8'h00;
-      direction_bit       <= 1;
-      //Transfer_cnt_DMA  <= 32'b0;
-      DMA_rcv_flag        <= 0;
-      recv_dma_cnt        <= 16'h0;
-      rst_delay_count     <= 3'h0;
-      DMA_data_rcv_error  <= 0;
+        txr_rdy             <= 1'b0;
+        state               <= HT_HostIdle ;
+        H_read_count        <= 16'd0;
+        rcv_fifo_wr_en      <= 1'b0;
+        data_rcv_fifo       <= 32'd0;
+        data_link_out_int   <= 32'd0;
+        //frame_end_T        <= 1'b0;
+        FIS_ERR             <= 1'b0;
+        UNRECGNZD_FIS_T     <= 1'b0;
+        Good_status_T       <= 1'b0;
+        hold_L              <= 1'b0;
+        recv_pio_dma_cnt    <= 16'd0;
+        count               <= 16'b0;
+        cmd_done            <= 1'd0;
+        prvs_pio            <= 1'b0;
+        fis_reg_DW0         <= 32'b0;
+        fis_reg_DW1         <= 32'b0;
+        fis_reg_DW2         <= 32'b0;
+        fis_reg_DW3         <= 32'b0;
+        fis_reg_DW4         <= 32'b0;
+        fis_reg_DW5         <= 32'b0;
+        fis_reg_DW6         <= 32'b0;
+        fis_count           <= 3'd0;
+        EscapeCF_T          <= 1'b0;
+        //data_rdy_T         <= 1'b0;
+        tl_ll_tx_fifo_reset <= 0;
+        data_link_out_wr_en <= 0;
+        pio_rcv_flag  <= 0;
+        tx_fifo_pio_rd_en   <= 0;
+        temp_status_reg     <= 8'h00;
+        direction_bit       <= 1;
+        //Transfer_cnt_DMA  <= 32'b0;
+        DMA_rcv_flag        <= 0;
+        recv_dma_cnt        <= 16'h0;
+        rst_delay_count     <= 3'h0;
+        DMA_data_rcv_error  <= 0;
     end  
     else if(detection) begin
     
@@ -1490,91 +1490,91 @@ module sata_transport (
     end
   end // main state machine end
               
-  // transmit fifo ...........................
-   assign tx_fifo_din       = DMA_RQST ? DMA_TX_DATA_IN : data_register_in ;    //   transmit data from dma to tx fifo connected to   sata_din
-   assign tx_fifo_wr_en     = DMA_RQST ? (DMA_TX_WEN && CE)   : tx_fifo_pio_wr_en;
-   assign tx_fifo_rd_en     = DMA_RQST ? tx_fifo_dma_rd_en    : tx_fifo_pio_rd_en;
-   //assign tx_fifo_pio_wr_en = H_write && (!status_register[7]) && status_register[3];
+    // transmit fifo ...........................
+    assign tx_fifo_din       = DMA_RQST ? DMA_TX_DATA_IN : data_register_in ;    //   transmit data from dma to tx fifo connected to   sata_din
+    assign tx_fifo_wr_en     = DMA_RQST ? (DMA_TX_WEN && CE)   : tx_fifo_pio_wr_en;
+    assign tx_fifo_rd_en     = DMA_RQST ? tx_fifo_dma_rd_en    : tx_fifo_pio_rd_en;
+    //assign tx_fifo_pio_wr_en = H_write && (!status_register[7]) && status_register[3];
                
-  //receiver fifo...............................
-  assign DMA_RX_DATA_OUT    = DMA_RQST  ?    rcv_fifo_data_out   : 32'h0;
-  assign RX_FIFO_RDY        = !rcv_fifo_prog_full; 
-  assign data_register_out  = rcv_fifo_data_out;
-  assign rx_fifo_pio_rd_en  = H_read && detection && (addr_reg == data_reg) && CE; // && (!status_register[7]);
-  assign rcv_fifo_rd_en     = DMA_RQST  ? (DMA_RX_REN && CE) : rx_fifo_pio_rd_en;
-  //assign HOLD_U       = direction_bit ? rcv_fifo_almost_empty : tx_fifo_prog_full;
-  assign WRITE_HOLD_U       = tx_fifo_prog_full;
-  assign READ_HOLD_U        = rcv_fifo_almost_empty; 
+    //receiver fifo...............................
+    assign DMA_RX_DATA_OUT    = DMA_RQST  ?    rcv_fifo_data_out   : 32'h0;
+    assign RX_FIFO_RDY        = !rcv_fifo_prog_full; 
+    assign data_register_out  = rcv_fifo_data_out;
+    assign rx_fifo_pio_rd_en  = H_read && detection && (addr_reg == data_reg) && CE; // && (!status_register[7]);
+    assign rcv_fifo_rd_en     = DMA_RQST  ? (DMA_RX_REN && CE) : rx_fifo_pio_rd_en;
+    //assign HOLD_U       = direction_bit ? rcv_fifo_almost_empty : tx_fifo_prog_full;
+    assign WRITE_HOLD_U       = tx_fifo_prog_full;
+    assign READ_HOLD_U        = rcv_fifo_almost_empty; 
   
-always @(posedge clk) begin
-    rcv_fifo_din <= data_link_in;
-end
+    always @(posedge clk) begin
+        rcv_fifo_din <= data_link_in;
+    end
   
-BUFGMUX_CTRL 
-BUFGMUX_CTRL_inst 
-(
-    .O (rx_fifo_rd_clk ),    // Clock MUX output
-    .I0(PIO_CLK_IN),         // Clock0 input
-    .I1(DMA_CLK_IN),         // Clock1 input
-    .S (DMA_RQST)            // Clock select input
-);
+    BUFGMUX_CTRL 
+    BUFGMUX_CTRL_inst 
+    (
+        .O (rx_fifo_rd_clk ),    // Clock MUX output
+        .I0(PIO_CLK_IN),         // Clock0 input
+        .I1(DMA_CLK_IN),         // Clock1 input
+        .S (DMA_RQST)            // Clock select input
+    );
 
-assign tx_fifo1_reset = reset || TX_FIFO_RESET;
+    assign tx_fifo1_reset = reset || TX_FIFO_RESET;
 
-//PIO and DMA Transmit FIO
-dma_tx_fifo
-dma_tx_fifo_inst
-(
-    .rst           (tx_fifo1_reset),      // input rst
-    .wr_clk        (rx_fifo_rd_clk),      // input wr_clk
-    .rd_clk        (clk),                 // input rd_clk
-    .din           (tx_fifo_din),         // input [31 : 0] din
-    .wr_en         (tx_fifo_wr_en),       // input wr_en
-    .rd_en         (tx_fifo_rd_en),       // input rd_en
-    .dout          (tx_fifo_dout),        // output [31 : 0] dout
-    .full          (),                    // output full
-    .empty         (tx_fifo_empty),       // output empty
-    .almost_empty  (tx_fifo_almost_empty),
-    .prog_full     (tx_fifo_prog_full)    // output prog_full
-);
+    //PIO and DMA Transmit FIO
+    dma_tx_fifo
+    dma_tx_fifo_inst
+    (
+        .rst           (tx_fifo1_reset),      // input rst
+        .wr_clk        (rx_fifo_rd_clk),      // input wr_clk
+        .rd_clk        (clk),                 // input rd_clk
+        .din           (tx_fifo_din),         // input [31 : 0] din
+        .wr_en         (tx_fifo_wr_en),       // input wr_en
+        .rd_en         (tx_fifo_rd_en),       // input rd_en
+        .dout          (tx_fifo_dout),        // output [31 : 0] dout
+        .full          (),                    // output full
+        .empty         (tx_fifo_empty),       // output empty
+        .almost_empty  (tx_fifo_almost_empty),
+        .prog_full     (tx_fifo_prog_full)    // output prog_full
+    );
   
-assign rx_fifo1_reset = reset || RX_FIFO_RESET;
+    assign rx_fifo1_reset = reset || RX_FIFO_RESET;
   
-//PIO and DMA Receive FIFO  
-dma_rx_fifo 
-dma_rx_fifo_inst
-(
-    .rst          (rx_fifo1_reset),        // input rst
-    .wr_clk       (clk),                   // input wr_clk
-    .rd_clk       (rx_fifo_rd_clk),        // input rd_clk
-    .din          (rcv_fifo_din),          // input [31 : 0] din
-    .wr_en        (rcv_fifo_wr_en),        // input wr_en
-    .rd_en        (rcv_fifo_rd_en),        // input rd_en
-    .dout         (rcv_fifo_data_out),     // output [31 : 0] dout
-    .full         (rcv_fifo_full),         // output full
-    .empty        (rcv_fifo_almost_empty), // output empty
-    .almost_empty (),
-    .prog_full    (rcv_fifo_prog_full),    // output prog_full
-    .rd_data_count()
-); 
+    //PIO and DMA Receive FIFO  
+    dma_rx_fifo 
+    dma_rx_fifo_inst
+    (
+        .rst          (rx_fifo1_reset),        // input rst
+        .wr_clk       (clk),                   // input wr_clk
+        .rd_clk       (rx_fifo_rd_clk),        // input rd_clk
+        .din          (rcv_fifo_din),          // input [31 : 0] din
+        .wr_en        (rcv_fifo_wr_en),        // input wr_en
+        .rd_en        (rcv_fifo_rd_en),        // input rd_en
+        .dout         (rcv_fifo_data_out),     // output [31 : 0] dout
+        .full         (rcv_fifo_full),         // output full
+        .empty        (rcv_fifo_almost_empty), // output empty
+        .almost_empty (),
+        .prog_full    (rcv_fifo_prog_full),    // output prog_full
+        .rd_data_count()
+    ); 
   
-//General Transmit FIFO
-general_fifo 
-general_fifo_inst 
-(
-    .clk          (clk),                     // input clk
-    .rst          (tl_ll_tx_fifo_reset),     // input rst
-    .din          (data_link_out_int),       // input [31 : 0] din
-    .wr_en        (data_link_out_wr_en),     // input wr_en
-    .rd_en        (data_link_rd_en_t),       // input rd_en
-    .dout         (data_link_out),           // output [31 : 0] dout
-    .full         (tl_ll_tx_fifo_full),      // output full
-    .empty        (tl_ll_tx_fifo_empty),     // output empty 
-    .almost_full  (),                        // output prog_full
-    .almost_empty (tl_ll_tx_fifo_almost_empty) // output prog_empty
-);
+    //General Transmit FIFO
+    general_fifo 
+    general_fifo_inst 
+    (
+        .clk          (clk),                     // input clk
+        .rst          (tl_ll_tx_fifo_reset),     // input rst
+        .din          (data_link_out_int),       // input [31 : 0] din
+        .wr_en        (data_link_out_wr_en),     // input wr_en
+        .rd_en        (data_link_rd_en_t),       // input rd_en
+        .dout         (data_link_out),           // output [31 : 0] dout
+        .full         (tl_ll_tx_fifo_full),      // output full
+        .empty        (tl_ll_tx_fifo_empty),     // output empty 
+        .almost_full  (),                        // output prog_full
+        .almost_empty (tl_ll_tx_fifo_almost_empty) // output prog_empty
+    );
 
-assign FRAME_END_T  = tl_ll_tx_fifo_empty;
-assign DATA_RDY_T   = !tl_ll_tx_fifo_almost_empty;
+    assign FRAME_END_T  = tl_ll_tx_fifo_empty;
+    assign DATA_RDY_T   = !tl_ll_tx_fifo_almost_empty;
             
 endmodule

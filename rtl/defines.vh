@@ -47,43 +47,51 @@
    `define X_RDY       32'h 5757B57C
            
            
-   `define L_IDLE         6'h 00
-   `define L_SyncEscape   6'h 01
-   `define L_NoCommErr    6'h 02
-   `define L_NoComm       6'h 03
-   `define L_SendAlign    6'h 04
-   `define L_RESET        6'h 05
+   `define L_IDLE         6'h00
+   `define L_SyncEscape   6'h01
+   `define L_NoCommErr    6'h02
+   `define L_NoComm       6'h03
+   `define L_SendAlign    6'h04
+   `define L_RESET        6'h05
    
-   `define HL_SendChkRdy  6'h 06
-   `define DL_SendChkRdy  6'h 07
-   `define L_SendSOF      6'h 08
-   `define L_SendData     6'h 09
-   `define L_RcvrHold     6'h 0A
-   `define L_SendHold     6'h 0B
-   `define L_SendCRC      6'h 0C
-   `define L_SendEOF      6'h 0D
-   `define L_Wait         6'h 0E
+   `define HL_SendChkRdy  6'h06
+   `define DL_SendChkRdy  6'h07
+   `define L_SendSOF      6'h08
+   `define L_SendData     6'h09
+   `define L_RcvrHold     6'h0A
+   `define L_SendHold     6'h0B
+   `define L_SendCRC      6'h0C
+   `define L_SendEOF      6'h0D
+   `define L_Wait         6'h0E
            
-   `define L_RcvChkRdy    6'h 0F
-   `define L_RcvWaitFifo  6'h 10
-   `define L_RcvData      6'h 11
-   `define L_Hold         6'h 12
-   `define L_RcvHold      6'h 13
-   `define L_RcvEOF       6'h 14
-   `define L_GoodCRC      6'h 15
-   `define L_GoodEnd      6'h 16
-   `define L_BadEnd       6'h 17
+   `define L_RcvChkRdy    6'h0F
+   `define L_RcvWaitFifo  6'h10
+   `define L_RcvData      6'h11
+   `define L_Hold         6'h12
+   `define L_RcvHold      6'h13
+   `define L_RcvEOF       6'h14
+   `define L_GoodCRC      6'h15
+   `define L_GoodEnd      6'h16
+   `define L_BadEnd       6'h17
            
-   `define L_TPMPartial   6'h 18
-   `define L_TPMSlumber   6'h 19
-   `define L_PMOff        6'h 1A
-   `define L_PMDeny       6'h 1B
-   `define L_ChkPhyRdy    6'h 1C
-   `define L_NoCommPower  6'h 1D
-   `define L_WakeUp1      6'h 1E
-   `define L_WakeUp2      6'h 1F
-   `define L_NoPmnak      6'h 20
+   `define L_TPMPartial   6'h18
+   `define L_TPMSlumber   6'h19
+   `define L_PMOff        6'h1A
+   `define L_PMDeny       6'h1B
+   `define L_ChkPhyRdy    6'h1C
+   `define L_NoCommPower  6'h1D
+   `define L_WakeUp1      6'h1E
+   `define L_WakeUp2      6'h1F
+   `define L_NoPmnak      6'h20
    
-   `define L_InsertAlign1 6'h 21
-   `define L_InsertAlign2 6'h 22
-   
+   `define L_InsertAlign1 6'h21
+   `define L_InsertAlign2 6'h22
+
+   `define REG_FIS_HOST2DEV            8'h27
+   `define REG_FIS_DEV2HOST            8'h34
+   `define DMA_ACTIV_FIS_DEV2HOST      8'h39
+   `define DMA_SETUP_FIS_BI_DIR        8'h41
+   `define DATA_FIS_BI_DIR             8'h46
+   `define BIST_ACTIVE_FIS_BI_DIR      8'h58
+   `define PIO_SETUP_FIS_DEV2HOST      8'h5F
+   `define SET_DEV_BITS_FIS_DEV2HOST   8'hA1
