@@ -4,7 +4,6 @@
 module out_of_band (
     input   wire            clk,                  // Clock
     input   wire            reset,                // reset
-    input   wire            link_reset,          
     input   wire            rx_locked,            // GTX PLL is locked
         
     input   wire [31:0]     tx_datain,            // Incoming TX data
@@ -26,13 +25,7 @@ module out_of_band (
     input   wire            comwakedet,           // RX OOB COMWAKE
     input   wire            rxelecidle,           // RX electrical idle
     output  wire            txelecidle,           // TX electircal idel
-    
     input   wire            rxbyteisaligned,      // RX byte alignment completed
-    output  wire  [3:0]     CurrentState_out,     // Current state for Chipscope
-    output  wire            align_det_out,        // ALIGN primitive detected
-    output  wire            sync_det_out,         // SYNC primitive detected
-    output  wire            rx_sof_det_out,       // Start Of Frame primitive detected
-    output  wire            rx_eof_det_out,       // End Of Frame primitive detected
 
     input   wire            gt0_rxresetdone_i,    // rx fsm reaet done
     input   wire            gt0_txresetdone_i,    // tx fsm reset done
@@ -89,7 +82,12 @@ parameter [3:0]
     wire        comreset_done, dev_cominit_done, HOST_COMWAKE_done, dev_comwake_done;
     wire        sof_det, eof_det;
     wire        align_cnt_en;
-        
+    
+    wire  [3:0] CurrentState_out;     // Current state for Chipscope
+    wire        align_det_out;        // ALIGN primitive detected
+    wire        sync_det_out;         // SYNC primitive detected
+    wire        rx_sof_det_out;       // Start Of Frame primitive detected
+    wire        rx_eof_det_out;       // End Of Frame primitive detected
         
 
 always@(posedge clk or posedge reset) begin : Linkup_synchronisation

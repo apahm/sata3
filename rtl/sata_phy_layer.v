@@ -6,15 +6,28 @@ module sata_phy_layer #(
     parameter STABLE_CLOCK_PERIOD                  = 6
 )
 (
-    input wire  Q0_CLK1_GTREFCLK_PAD_N_IN,
-    input wire  Q0_CLK1_GTREFCLK_PAD_P_IN,
-    input wire  DRP_CLK_IN_P,
-    input wire  DRP_CLK_IN_N,
-    output wire TRACK_DATA_OUT,
-    input  wire         RXN_IN,
-    input  wire         RXP_IN,
-    output wire         TXN_OUT,
-    output wire         TXP_OUT
+    input   wire            Q0_CLK1_GTREFCLK_PAD_N_IN,
+    input   wire            Q0_CLK1_GTREFCLK_PAD_P_IN,
+    
+    input   wire            DRP_CLK_IN_P,
+    input   wire            DRP_CLK_IN_N,
+    
+    output  wire            TRACK_DATA_OUT,
+    
+    input   wire            RXN_IN,
+    input   wire            RXP_IN,
+    output  wire            TXN_OUT,
+    output  wire            TXP_OUT,
+
+    input   wire [31:0]     tx_data_in,
+    input   wire            tx_charisk_in,
+    
+    output  wire [31:0]     rx_data_out,
+    output  wire [3:0]      rx_charisk_out,
+
+    output  wire            linkup,
+    output  wire            gt_usrclk
+
 );
 
     wire soft_reset_i;
@@ -39,8 +52,8 @@ module sata_phy_layer #(
     (* ASYNC_REG = "TRUE" *)reg             gt0_rxresetdone_vio_r2;
     (* ASYNC_REG = "TRUE" *)reg             gt0_rxresetdone_vio_r3;
 
-    reg [5:0] reset_counter = 0;
-    reg     [3:0]   reset_pulse;
+    reg [5:0]       reset_counter = 0;
+    reg [3:0]       reset_pulse;
 
 //**************************** Wire Declarations ******************************//
     //------------------------ GT Wrapper Wires ------------------------------
@@ -202,66 +215,47 @@ module sata_phy_layer #(
     wire            rx_vio_ila_clk_mux_out_i;
 
     wire            qpllreset_i;
+
+    assign tied_to_ground_i = 1'b0;
+    assign tied_to_ground_vec_i = 64'h0000000000000000;
+    assign tied_to_vcc_i = 1'b1;
+    assign tied_to_vcc_vec_i = 8'hff;
+
+    assign  q0_clk1_refclk_i =  1'b0;
+
+    assign  gt0_txcomsas_i = 0;
+    assign  gt0_rxdfelpmreset_i =  tied_to_ground_i;
+    assign  gt0_rxpmareset_i =  tied_to_ground_i;
+    assign  gt0_rxpolarity_i =  tied_to_ground_i;
+    assign  gt0_rxrate_i = 0;
+    assign  gt0_txpolarity_i = tied_to_ground_i;
+    assign  gt0_txrate_i = 0;
     
+    assign gt0_drpaddr_i = 9'd0;
+    assign gt0_drpdi_i = 16'd0;
+    assign gt0_drpen_i = 1'b0;
+    assign gt0_drpwe_i = 1'b0;
+    assign soft_reset_i = tied_to_ground_i;
 
-
-    wire [(80 -32) -1:0] zero_vector_rx_80 ;
-    wire [(8 -4) -1:0] zero_vector_rx_8 ;
-    wire [79:0] gt0_rxdata_ila ;
-    wire [1:0]  gt0_rxdatavalid_ila; 
-    wire [7:0]  gt0_rxcharisk_ila ;
-    wire gt0_txmmcm_lock_ila ;
-    wire gt0_rxmmcm_lock_ila ;
-    wire gt0_rxresetdone_ila ;
-    wire gt0_txresetdone_ila ;
-
-//**************************** Main Body of Code *******************************
-
-    //  Static signal Assigments    
-    assign tied_to_ground_i             = 1'b0;
-    assign tied_to_ground_vec_i         = 64'h0000000000000000;
-    assign tied_to_vcc_i                = 1'b1;
-    assign tied_to_vcc_vec_i            = 8'hff;
-
-    assign zero_vector_rx_80 = 0;
-    assign zero_vector_rx_8 = 0;
-
-    
-    assign  q0_clk1_refclk_i                     =  1'b0;
-
-    //***********************************************************************//
-    //--------------------------- The GT Wrapper ----------------------------//
-    //                                                                       //
-    //***********************************************************************//
-    
-    // Use the instantiation template in the example directory to add the GT wrapper to your design.
-    // In this example, the wrapper is wired up for basic operation with a frame generator and frame 
-    // checker. The GTs will reset, then attempt to align and transmit data. If channel bonding is 
-    // enabled, bonding should occur after alignment.
-    // While connecting the GT TX/RX Reset ports below, please add a delay of
-    // minimum 500ns as mentioned in AR 43482.
-
-    
-    gtwizard_0_support #
-    (
+    gtwizard_support #(
         .EXAMPLE_SIM_GTRESET_SPEEDUP    (EXAMPLE_SIM_GTRESET_SPEEDUP),
         .STABLE_CLOCK_PERIOD            (STABLE_CLOCK_PERIOD)
     )
-    gtwizard_0_support_i
+    gtwizard_support_inst
     (
-        .soft_reset_tx_in               (soft_reset_i),
-        .soft_reset_rx_in               (soft_reset_i),
-        .dont_reset_on_data_error_in    (tied_to_ground_i),
-        .q0_clk1_gtrefclk_pad_n_in(Q0_CLK1_GTREFCLK_PAD_N_IN),
-        .q0_clk1_gtrefclk_pad_p_in(Q0_CLK1_GTREFCLK_PAD_P_IN),
-        .gt0_tx_fsm_reset_done_out      (gt0_txfsmresetdone_i),
-        .gt0_rx_fsm_reset_done_out      (gt0_rxfsmresetdone_i),
-        .gt0_data_valid_in              (gt0_track_data_i),
+        .soft_reset_tx_in                   (soft_reset_i),
+        .soft_reset_rx_in                   (soft_reset_i),
+        .dont_reset_on_data_error_in        (tied_to_ground_i),
+        .q0_clk1_gtrefclk_pad_n_in          (Q0_CLK1_GTREFCLK_PAD_N_IN),
+        .q0_clk1_gtrefclk_pad_p_in          (Q0_CLK1_GTREFCLK_PAD_P_IN),
+        .gt0_tx_fsm_reset_done_out          (gt0_txfsmresetdone_i),
+        .gt0_rx_fsm_reset_done_out          (gt0_rxfsmresetdone_i),
+        .gt0_data_valid_in                  (gt0_track_data_i),
  
-        .gt0_txusrclk_out(gt0_txusrclk_i),
-        .gt0_txusrclk2_out(gt0_txusrclk2_i),
-        .gt0_rxusrclk_out(gt0_rxusrclk_i),
-        .gt0_rxusrclk2_out(gt0_rxusrclk2_i),
+        .gt0_txusrclk_out                   (gt0_txusrclk_i),
+        .gt0_txusrclk2_out                  (gt0_txusrclk2_i),
+        .gt0_rxusrclk_out                   (gt0_rxusrclk_i),
+        .gt0_rxusrclk2_out                  (gt0_rxusrclk2_i),
 
 
         //_____________________________________________________________________
@@ -354,13 +348,11 @@ module sata_phy_layer #(
         //--------------- Transmit Ports - TX Polarity Control Ports ---------------
         .gt0_txpolarity_in              (gt0_txpolarity_i),
 
-
-    //____________________________COMMON PORTS________________________________
-    .gt0_qplllock_out(),
-    .gt0_qpllrefclklost_out(),
-    .gt0_qplloutclk_out(),
-    .gt0_qplloutrefclk_out(),
-    .sysclk_in(drpclk_in_i)
+        .gt0_qplllock_out               (gt0_qplllock_i),
+        .gt0_qpllrefclklost_out         (),
+        .gt0_qplloutclk_out             (),
+        .gt0_qplloutrefclk_out          (),
+        .sysclk_in                      (drpclk_in_i)
     );
 
     IBUFDS IBUFDS_DRP_CLK
@@ -376,38 +368,27 @@ module sata_phy_layer #(
         .O                              (drpclk_in_i) 
     );
 
- 
-always @(posedge gt0_rxusrclk2_i or negedge gt0_rxresetdone_i)
-
-    begin
-        if (!gt0_rxresetdone_i)
-        begin
-            gt0_rxresetdone_r    <=   `DLY 1'b0;
-            gt0_rxresetdone_r2   <=   `DLY 1'b0;
-            gt0_rxresetdone_r3   <=   `DLY 1'b0;
+    always @(posedge gt0_rxusrclk2_i or negedge gt0_rxresetdone_i) begin
+        if (!gt0_rxresetdone_i) begin
+            gt0_rxresetdone_r  <= 1'b0;
+            gt0_rxresetdone_r2 <= 1'b0;
+            gt0_rxresetdone_r3 <= 1'b0;
         end
-        else
-        begin
-            gt0_rxresetdone_r    <=   `DLY gt0_rxresetdone_i;
-            gt0_rxresetdone_r2   <=   `DLY gt0_rxresetdone_r;
-            gt0_rxresetdone_r3   <=   `DLY gt0_rxresetdone_r2;
+        else begin
+            gt0_rxresetdone_r    <=  gt0_rxresetdone_i;
+            gt0_rxresetdone_r2   <=  gt0_rxresetdone_r;
+            gt0_rxresetdone_r3   <=  gt0_rxresetdone_r2;
         end
     end
-
     
-    
-always @(posedge  gt0_txusrclk2_i or negedge gt0_txfsmresetdone_i)
-
-    begin
-        if (!gt0_txfsmresetdone_i)
-        begin
-            gt0_txfsmresetdone_r    <=   `DLY 1'b0;
-            gt0_txfsmresetdone_r2   <=   `DLY 1'b0;
+    always @(posedge  gt0_txusrclk2_i or negedge gt0_txfsmresetdone_i) begin
+        if (!gt0_txfsmresetdone_i) begin
+            gt0_txfsmresetdone_r  <= 1'b0;
+            gt0_txfsmresetdone_r2 <= 1'b0;
         end
-        else
-        begin
-            gt0_txfsmresetdone_r    <=   `DLY gt0_txfsmresetdone_i;
-            gt0_txfsmresetdone_r2   <=   `DLY gt0_txfsmresetdone_r;
+        else begin
+            gt0_txfsmresetdone_r  <= gt0_txfsmresetdone_i;
+            gt0_txfsmresetdone_r2 <= gt0_txfsmresetdone_r;
         end
     end
 
@@ -415,62 +396,40 @@ always @(posedge  gt0_txusrclk2_i or negedge gt0_txfsmresetdone_i)
 
     assign track_data_out_i = gt0_track_data_i ;
 
+    out_of_band 
+    out_of_band_inst 
+    (
+        .clk                (gt0_txusrclk2_i),
+        .reset              (),
 
+        .rx_locked          (gt0_qplllock_i),
 
+        .tx_datain          (tx_data_in),      
+        .tx_chariskin       (tx_charisk_in),
+        .tx_dataout         (gt0_txdata_i),      
+        .tx_charisk_out     (gt0_txcharisk_i),          
+        .rx_charisk         (gt0_rxcharisk_i),                             
+        .rx_datain          (gt0_rxdata_i),       
+        .rx_dataout         (rx_data_out),      
+        .rx_charisk_out     (rx_charisk_out), 
 
-out_of_band 
-out_of_band_inst 
-(
-    .clk                (),
-    .reset              (),
-    .link_reset         (),
-    .rx_locked          (),
-    .tx_datain          (),      
-    .tx_chariskin       (),
-    .tx_dataout         (),      
-    .tx_charisk_out     (),          
-    .rx_charisk         (),                             
-    .rx_datain          (),       
-    .rx_dataout         (),      
-    .rx_charisk_out     (), 
-    .linkup             (),
-    .gen                (),
-    .rxreset            (),
-    .txcominit          (),
-    .txcomwake          (),
-    .cominitdet         (), 
-    .comwakedet         (),
-    .rxelecidle         (),
-    .txelecidle         (),
-    .rxbyteisaligned    (), 
-    .CurrentState_out   (),
-    .align_det_out      (),
-    .sync_det_out       (),
-    .rx_sof_det_out     (),
-    .rx_eof_det_out     (),
-    .gt0_rxresetdone_i  (),
-    .gt0_txresetdone_i  (),
-    .gtx_rx_reset_out   ()
-);
+        .linkup             (linkup),
+        .gen                (2'b10),
+        .rxreset            (),
+        
+        .txcominit          (gt0_txcominit_i),
+        .txcomwake          (gt0_txcomwake_i),
+        .cominitdet         (gt0_rxcominitdet_i), 
+        .comwakedet         (gt0_rxcomwakedet_i),
+        .rxelecidle         (gt0_rxelecidle_i),
+        .txelecidle         (gt0_txelecidle_i),
+        .rxbyteisaligned    (gt0_rxbyteisaligned_i), 
 
-//------------ optional Ports assignments --------------
-assign  gt0_txcominit_i                      =  0;
-assign  gt0_txcomsas_i                       =  0;
-assign  gt0_txcomwake_i                      =  0;
- //------GTH/GTP
-assign  gt0_rxdfelpmreset_i                  =  tied_to_ground_i;
-assign  gt0_rxpmareset_i                     =  tied_to_ground_i;
-assign  gt0_rxpolarity_i                     =  tied_to_ground_i;
-assign  gt0_rxrate_i                         =  0;
-assign  gt0_txelecidle_i                     =  tied_to_ground_i;
-assign  gt0_txpolarity_i                     =  tied_to_ground_i;
-assign  gt0_txrate_i                         =  0;
+        .gt0_rxresetdone_i  (),
+        .gt0_txresetdone_i  (),
 
-assign gt0_drpaddr_i = 9'd0;
-assign gt0_drpdi_i = 16'd0;
-assign gt0_drpen_i = 1'b0;
-assign gt0_drpwe_i = 1'b0;
-assign soft_reset_i = tied_to_ground_i;
+        .gtx_rx_reset_out   ()
+    );
 
 endmodule
     

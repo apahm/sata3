@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `define DLY #1
 
-module gtwizard_0_support #(
+module gtwizard_support #(
     parameter EXAMPLE_SIM_GTRESET_SPEEDUP            = "TRUE",    
     parameter STABLE_CLOCK_PERIOD                    = 6         
 
@@ -114,7 +114,7 @@ module gtwizard_0_support #(
     output      gt0_qpllrefclklost_out,
     output      gt0_qplloutclk_out,
     output      gt0_qplloutrefclk_out,
-    input          sysclk_in
+    input       sysclk_in
 
 );
 
@@ -235,10 +235,10 @@ module gtwizard_0_support #(
     wire            QPLLRESET_IN;
 
      //--------------------------- User Clocks ---------------------------------
-     wire            gt0_txusrclk_i; 
-     wire            gt0_txusrclk2_i; 
-     wire            gt0_rxusrclk_i; 
-     wire            gt0_rxusrclk2_i; 
+    wire            gt0_txusrclk_i; 
+    wire            gt0_txusrclk2_i; 
+    wire            gt0_rxusrclk_i; 
+    wire            gt0_rxusrclk2_i; 
  
     //--------------------------- Reference Clocks ----------------------------
     
@@ -247,40 +247,31 @@ module gtwizard_0_support #(
     wire commonreset_i;
     wire commonreset_t;
 
-//**************************** Main Body of Code *******************************
-
-    //  Static signal Assigments    
     assign tied_to_ground_i             = 1'b0;
     assign tied_to_ground_vec_i         = 64'h0000000000000000;
     assign tied_to_vcc_i                = 1'b1;
     assign tied_to_vcc_vec_i            = 8'hff;
 
- 
-
-     assign gt0_qplllock_out  = gt0_qplllock_i;
-     assign gt0_qpllrefclklost_out = gt0_qpllrefclklost_i;
-     assign gt0_qpllreset_t = commonreset_i | gt0_qpllreset_i;
+    assign gt0_qplllock_out  = gt0_qplllock_i;
+    assign gt0_qpllrefclklost_out = gt0_qpllrefclklost_i;
+    assign gt0_qpllreset_t = commonreset_i | gt0_qpllreset_i;
      
     assign gt0_qplloutclk_out = gt0_qplloutclk_i;
     assign gt0_qplloutrefclk_out = gt0_qplloutrefclk_i;
 
-
- 
     assign  gt0_txusrclk_out = gt0_txusrclk_i; 
     assign  gt0_txusrclk2_out = gt0_txusrclk2_i;
     assign  gt0_rxusrclk_out = gt0_rxusrclk_i;
     assign  gt0_rxusrclk2_out = gt0_rxusrclk2_i;
 
-
     gtwizard_gt_usrclk_source 
     gt_usrclk_source_inst
     (
-     
-        .GT0_TXUSRCLK_OUT    (gt0_txusrclk_i),
-        .GT0_TXUSRCLK2_OUT   (gt0_txusrclk2_i),
-        .GT0_TXOUTCLK_IN     (gt0_txoutclk_i),
-        .GT0_RXUSRCLK_OUT    (gt0_rxusrclk_i),
-        .GT0_RXUSRCLK2_OUT   (gt0_rxusrclk2_i),
+        .GT0_TXUSRCLK_OUT           (gt0_txusrclk_i),
+        .GT0_TXUSRCLK2_OUT          (gt0_txusrclk2_i),
+        .GT0_TXOUTCLK_IN            (gt0_txoutclk_i),
+        .GT0_RXUSRCLK_OUT           (gt0_rxusrclk_i),
+        .GT0_RXUSRCLK2_OUT          (gt0_rxusrclk2_i),
      
         .Q0_CLK1_GTREFCLK_PAD_N_IN  (q0_clk1_gtrefclk_pad_n_in),
         .Q0_CLK1_GTREFCLK_PAD_P_IN  (q0_clk1_gtrefclk_pad_p_in),

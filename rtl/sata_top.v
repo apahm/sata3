@@ -43,9 +43,6 @@ module sata_top#(
     input   wire            RX_FIFO_RESET,               // reset signal for Receive data fifo
     input   wire            TX_FIFO_RESET,               // reset signal for Transmit data fifo
     output  wire            DMA_DATA_RCV_ERROR,           // indicates error during DMA data receive operation
-    input   wire            OOB_reset_IN,
-    input   wire            RX_FSM_reset_IN,
-    input   wire            TX_FSM_reset_IN,
 
     input   wire                            axi_lite_aclk,
     input   wire                            axi_lite_aresetn,
@@ -165,22 +162,20 @@ sata_phy_layer_inst
     .TILE0_REFCLK_PAD_N_IN  (TILE0_REFCLK_PAD_N_IN),
     .GTXRESET_IN            (GTPRESET_IN),
     .TILE0_PLLLKDET_OUT     (TILE0_PLLLKDET_OUT),
+    
     .TXP0_OUT               (TXP0_OUT),
     .TXN0_OUT               (TXN0_OUT),
     .RXP0_IN                (RXP0_IN),
     .RXN0_IN                (RXN0_IN),
-    .DCMLOCKED_OUT          (DCMLOCKED_OUT),
+
     .LINKUP                 (linkup_int),
     .logic_clk              (clk),
-    .GEN                    (GEN),
+
     .tx_data_in             (link_tx_data_out),
     .tx_charisk_in          (link_tx_charisk_out),
     .rx_data_out            (phy_rx_data_out),
     .rx_charisk_out         (phy_rx_charisk_out),
-    .logic_reset            (logic_reset),
-    .OOB_reset_IN           (OOB_reset_IN),
-    .RX_FSM_reset_IN        (RX_FSM_reset_IN),
-	.TX_FSM_reset_IN        (TX_FSM_reset_IN)    
+    .logic_reset            (logic_reset)
 );
   
 assign LINKUP = linkup_int; 
