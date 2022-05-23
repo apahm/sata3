@@ -9,9 +9,6 @@ module sata_phy_layer #(
     input   wire            Q0_CLK1_GTREFCLK_PAD_N_IN,
     input   wire            Q0_CLK1_GTREFCLK_PAD_P_IN,
     
-    input   wire            DRP_CLK_IN_P,
-    input   wire            DRP_CLK_IN_N,
-    
     output  wire            TRACK_DATA_OUT,
     
     input   wire            RXN_IN,
@@ -351,21 +348,7 @@ module sata_phy_layer #(
         .gt0_qplllock_out               (gt0_qplllock_i),
         .gt0_qpllrefclklost_out         (),
         .gt0_qplloutclk_out             (),
-        .gt0_qplloutrefclk_out          (),
-        .sysclk_in                      (drpclk_in_i)
-    );
-
-    IBUFDS IBUFDS_DRP_CLK
-     (
-        .I  (DRP_CLK_IN_P),
-        .IB (DRP_CLK_IN_N),
-        .O  (DRPCLK_IN)
-     );
-
-    BUFG DRP_CLK_BUFG
-    (
-        .I                              (DRPCLK_IN),
-        .O                              (drpclk_in_i) 
+        .gt0_qplloutrefclk_out          ()
     );
 
     always @(posedge gt0_rxusrclk2_i or negedge gt0_rxresetdone_i) begin
@@ -394,7 +377,7 @@ module sata_phy_layer #(
 
     assign TRACK_DATA_OUT = track_data_out_i;
 
-    assign track_data_out_i = gt0_track_data_i ;
+    assign track_data_out_i = gt0_track_data_i;
 
     out_of_band 
     out_of_band_inst 

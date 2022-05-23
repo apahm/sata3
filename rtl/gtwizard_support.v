@@ -4,7 +4,6 @@
 module gtwizard_support #(
     parameter EXAMPLE_SIM_GTRESET_SPEEDUP            = "TRUE",    
     parameter STABLE_CLOCK_PERIOD                    = 6         
-
 )
 (
     input           soft_reset_tx_in,
@@ -110,19 +109,12 @@ module gtwizard_support #(
     input           gt0_txpolarity_in,
 
     //____________________________COMMON PORTS________________________________
-    output      gt0_qplllock_out,
-    output      gt0_qpllrefclklost_out,
-    output      gt0_qplloutclk_out,
-    output      gt0_qplloutrefclk_out,
-    input       sysclk_in
-
+    output          gt0_qplllock_out,
+    output          gt0_qpllrefclklost_out,
+    output          gt0_qplloutclk_out,
+    output          gt0_qplloutrefclk_out
 );
 
-
-    //------------------------ GT Wrapper Wires ------------------------------
-    //________________________________________________________________________
-    //________________________________________________________________________
-    //GT0  (X1Y0)
     //-------------------------- Channel - DRP Ports  --------------------------
     wire    [8:0]   gt0_drpaddr_i;
     wire    [15:0]  gt0_drpdi_i;
@@ -213,19 +205,18 @@ module gtwizard_support #(
     //--------------- Transmit Ports - TX Polarity Control Ports ---------------
     wire            gt0_txpolarity_i;
 
-    wire  gt0_qplllock_i;
-    wire  gt0_qpllrefclklost_i  ;
-    wire  gt0_qpllreset_i  ;
-    wire  gt0_qpllreset_t  ;
-    wire  gt0_qplloutclk_i  ;
-    wire  gt0_qplloutrefclk_i ;
+    wire            gt0_qplllock_i;
+    wire            gt0_qpllrefclklost_i  ;
+    wire            gt0_qpllreset_i  ;
+    wire            gt0_qpllreset_t  ;
+    wire            gt0_qplloutclk_i  ;
+    wire            gt0_qplloutrefclk_i ;
 
     //----------------------------- Global Signals -----------------------------
 
     wire            sysclk_in_i;
     wire            gt0_tx_system_reset_c;
     wire            gt0_rx_system_reset_c;
-   // wire   [1:0]   gt0_txsysclksel_i;
     wire            tied_to_ground_i;
     wire    [63:0]  tied_to_ground_vec_i;
     wire            tied_to_vcc_i;
@@ -243,9 +234,9 @@ module gtwizard_support #(
     //--------------------------- Reference Clocks ----------------------------
     
     wire            q0_clk1_refclk_i;
-
-    wire commonreset_i;
-    wire commonreset_t;
+    wire            sysclk_in;
+    wire            commonreset_i;
+    wire            commonreset_t;
 
     assign tied_to_ground_i             = 1'b0;
     assign tied_to_ground_vec_i         = 64'h0000000000000000;
@@ -275,7 +266,8 @@ module gtwizard_support #(
      
         .Q0_CLK1_GTREFCLK_PAD_N_IN  (q0_clk1_gtrefclk_pad_n_in),
         .Q0_CLK1_GTREFCLK_PAD_P_IN  (q0_clk1_gtrefclk_pad_p_in),
-        .Q0_CLK1_GTREFCLK_OUT       (q0_clk1_refclk_i)
+        .Q0_CLK1_GTREFCLK_OUT       (q0_clk1_refclk_i),
+        .STABLE_CLOCK_OUT           (sysclk_in)
     );
 
     assign  sysclk_in_i = sysclk_in;

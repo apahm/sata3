@@ -7,9 +7,12 @@ module gtwizard_gt_usrclk_source
     input  wire         GT0_TXOUTCLK_IN,
     output wire         GT0_RXUSRCLK_OUT,
     output wire         GT0_RXUSRCLK2_OUT,
+    
     input  wire         Q0_CLK1_GTREFCLK_PAD_N_IN,
     input  wire         Q0_CLK1_GTREFCLK_PAD_P_IN,
-    output wire         Q0_CLK1_GTREFCLK_OUT
+    output wire         Q0_CLK1_GTREFCLK_OUT,
+    output wire         STABLE_CLOCK_OUT
+
 );
 
     wire            tied_to_ground_i;
@@ -17,7 +20,7 @@ module gtwizard_gt_usrclk_source
  
     wire            gt0_txoutclk_i; 
     wire            q0_clk1_gtrefclk;
-
+    wire            stable_clock_out_int;
     wire            gt0_txusrclk_i;
 
     assign tied_to_ground_i = 1'b0;
@@ -30,21 +33,28 @@ module gtwizard_gt_usrclk_source
     IBUFDS_GTE2 
     ibufds_inst  
     (
-        .O               (q0_clk1_gtrefclk),
-        .ODIV2           (),
-        .CEB             (tied_to_ground_i),
-        .I               (Q0_CLK1_GTREFCLK_PAD_P_IN),
-        .IB              (Q0_CLK1_GTREFCLK_PAD_N_IN)
+        .O                  (q0_clk1_gtrefclk),
+        .ODIV2              (),
+        .CEB                (tied_to_ground_i),
+        .I                  (Q0_CLK1_GTREFCLK_PAD_P_IN),
+        .IB                 (Q0_CLK1_GTREFCLK_PAD_N_IN)
     );
 
     BUFG 
     txoutclk_inst
     (
-        .I                              (gt0_txoutclk_i),
-        .O                              (gt0_txusrclk_i)
+        .I                  (gt0_txoutclk_i),
+        .O                  (gt0_txusrclk_i)
     );
 
- 
+    BUFG
+    stable_clock_bufg
+    (
+        .I                  (q0_clk1_gtrefclk),
+        .O                  (stable_clock_out_int)
+    );
+
+    assign STABLE_CLOCK_OUT = stable_clock_out_int;
     assign GT0_TXUSRCLK_OUT = gt0_txusrclk_i;
     assign GT0_TXUSRCLK2_OUT = gt0_txusrclk_i;
     assign GT0_RXUSRCLK_OUT = gt0_txusrclk_i;
