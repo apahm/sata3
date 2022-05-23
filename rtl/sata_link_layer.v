@@ -1,25 +1,3 @@
-/******************************************************************************
-									 LINK LAYER
-
-						_______                          
-	data_in_t|       |data_crc_out_tx 
-	-------->|  crc  |--->|\  data_scrmb_in     data_scrmb_out 
-		 |     |_______|  1 | \         ___________       ____________ 
-		 |                  |  |       |           |     |            | data_out_p_int
-		 |                  |  |------>| scrambler |---->| EncoderFSM |------------>
-		 |                0 |  |       |___________|     |____________|
-		 |----------------->| /                                
-			data_in_t         |/|                                  
-													|                                                       
-						 tx_crc_en--->|   
-	 
-	 ___________      _____________      _______      __________        
-	|           |    |             |    |       |    |          |       
-	|decoderFSM |--->| unscrambler |--->|  crc  |--->|data_out_t|       
-	|___________|    |_____________|    |_______|    |__________|       
-					 
-data_in_p(data_in_p_int)    data_out_t_int  data_crc_out_rx
-******************************************************************************/
 `include "defines.vh"
 
 `timescale 1ns / 1ps
@@ -28,72 +6,70 @@ module sata_link_layer #(
 	parameter integer CHIPSCOPE = 0
 )
 (
-	input              clk,
-	input              rst,
+	input 	wire 			clk,
+	input 	wire 			rst,
 	
-	input      [31:0]  data_in_p,       // Data from Phy layer
-	input      [31:0]  data_in_t,       // Data from Transpor layer
-	output reg [31:0]  data_out_p,      // data to phy
-	output reg [31:0]  data_out_t,      // data to T-layer
+	input	wire   	[31:0]  data_in_p,       // Data from Phy layer
+	input	wire   	[31:0]  data_in_t,       // Data from Transpor layer
 	
-	input              PHYRDY,          // LINKUP
-	input              TX_RDY_T,         // T-layer requests frame transmission
-	input              PMREQ_P_T,       // T-layer requests transition to Partial
-	input              PMREQ_S_T,       // T-layer requests transition to Slumber
-	input              PM_EN,           // Link Layer is enabled to perform PM modes & in a state to accept pwr mode req.
-	input              LRESET,          // Link Layer RESET
-	input              data_rdy_T,      // T-layer indicates the availability of next Dword 
-	output reg         phy_detect_T,    // Inform T-layer that Phy rdy
-	output reg         illegal_state_t, // notify the T-layer of the illegal transition error condition
-	input              EscapeCF_T,      // Notification from the T-layer to escape from current frame transfer
-	input              frame_end_T,     // T-layer indicates all data for the frame has been transferred
-	input              DecErr,          // Decoding error
-	output reg         tx_termn_T_o,    // Notify the T-layer to terminate the transmission in progress,
-	input              rx_FIFO_rdy,     // FIFO space availability
-	output reg         rx_fail_T,       // Notify the T-layer that reception was aborted
-	output reg         crc_err_T,       // Notify the T-layer about CRC error
-	output reg         valid_CRC_T,     // CRC is valid for the frame
-	input              FIS_err,         // T or L-layer indicated error detected during reception of recognized FIS.
-	input              Good_status_T,   // Transport layer indicates a good result
-	input              Unrecgnzd_FIS_T, // Transport layer indicates an unrecognized FIS
-	input              tx_termn_T_i,    // Req from T-layer to terminate the transmission
-	output reg         R_OK_T,          // R_OK received from phy
-	output reg         R_ERR_T,         // R_ERR received from phy
-	output reg         SOF_T,           // Notifying T-layer that SOF is recieved from phy
-	output reg         EOF_T,           // Notifying T-layer that EOF is recieved from phy
-	output reg         cntrl_char,      // '1' for control character & '0' for data character
-	input              RX_CHARISK_IN,   // '1' for control character & '0' for data character
-	output reg         tx_rdy_ack_t,    // indicates link is rdy to T-layer
-	output reg         data_out_vld_T,  // data to tasport layer is valid,
-	output reg         R_OK_SENT_T,     // R_OK sent to PHY
-	output reg         data_in_rd_en_t, // read enable to transport layer                   
-	output reg         X_RDY_SENT_T,    // activate after sending X_RDY primitive.
-	output reg         DMA_TERMINATED   // DMA Terminated
+	output 	reg 	[31:0]  data_out_p,      // data to phy
+	output 	reg 	[31:0]  data_out_t,      // data to T-layer
+	
+	input 	wire          	phyrdy,          // LINKUP
+	input 	wire          	TX_RDY_T,         // T-layer requests frame transmission
+	input 	wire          	PMREQ_P_T,       // T-layer requests transition to Partial
+	input 	wire          	PMREQ_S_T,       // T-layer requests transition to Slumber
+	input 	wire          	PM_EN,           // Link Layer is enabled to perform PM modes & in a state to accept pwr mode req.
+	input 	wire          	LRESET,          // Link Layer RESET
+	input 	wire          	data_rdy_T,      // T-layer indicates the availability of next Dword 
+	output	reg 			phy_detect_T,    // Inform T-layer that Phy rdy
+	output	reg 			illegal_state_t, // notify the T-layer of the illegal transition error condition
+	input 	wire            EscapeCF_T,      // Notification from the T-layer to escape from current frame transfer
+	input 	wire            frame_end_T,     // T-layer indicates all data for the frame has been transferred
+	input 	wire            DecErr,          // Decoding error
+	output 	reg         	tx_termn_T_o,    // Notify the T-layer to terminate the transmission in progress,
+	input 	wire            rx_FIFO_rdy,     // FIFO space availability
+	output 	reg         	rx_fail_T,       // Notify the T-layer that reception was aborted
+	output 	reg         	crc_err_T,       // Notify the T-layer about CRC error
+	output 	reg         	valid_CRC_T,     // CRC is valid for the frame
+	input 	wire            FIS_err,         // T or L-layer indicated error detected during reception of recognized FIS.
+	input 	wire            Good_status_T,   // Transport layer indicates a good result
+	input 	wire            Unrecgnzd_FIS_T, // Transport layer indicates an unrecognized FIS
+	input 	wire            tx_termn_T_i,    // Req from T-layer to terminate the transmission
+	output 	reg         	R_OK_T,          // R_OK received from phy
+	output 	reg         	R_ERR_T,         // R_ERR received from phy
+	output 	reg         	SOF_T,           // Notifying T-layer that SOF is recieved from phy
+	output 	reg         	EOF_T,           // Notifying T-layer that EOF is recieved from phy
+	output 	reg         	cntrl_char,      // '1' for control character & '0' for data character
+	input	wire           	RX_CHARISK_IN,   // '1' for control character & '0' for data character
+	output 	reg         	tx_rdy_ack_t,    // indicates link is rdy to T-layer
+	output 	reg         	data_out_vld_T,  // data to tasport layer is valid,
+	output 	reg         	data_in_rd_en_t // read enable to transport layer                   
 );
 
 
 
 	// crc, scrambler, unscrambler outputs
 
-	wire  [31:0]  data_crc_out_tx  ;      // data input to Link from crc generator
-	wire  [31:0]  data_crc_out_rx  ;      // data input to Link from crc checker
-	wire  [31:0]  data_scrmb_out     ;      // data input to Link from scrambler  
+	wire  [31:0]  data_crc_out_tx;      // data input to Link from crc generator
+	wire  [31:0]  data_crc_out_rx;      // data input to Link from crc checker
+	wire  [31:0]  data_scrmb_out;      // data input to Link from scrambler  
 
 	// crc, scrambler, unscrambler inputs
-	reg [31:0]  data_unscr_in ;            // data from T-layer scrambler
+	reg [31:0]  data_unscr_in;            // data from T-layer scrambler
 
-	reg [ 5:0]  state         ;
-	reg crc_en_tx             ;                  
-	reg crc_en_rx             ;
-	reg scrmb_en              ;
-	reg scrmb_rst             ;
-	reg unscrmb_en_fsm            ;
-	reg unscrmb_rst           ;
-	reg hold_arrived;
+	reg [ 5:0]  state;
+	reg 		crc_en_tx;                  
+	reg 		crc_en_rx;
+	reg 		scrmb_en;
+	reg 		scrmb_rst;
+	reg 		unscrmb_en_fsm;
+	reg 		unscrmb_rst;
+	reg 		hold_arrived;
 	
-	wire rx_charisk_out;
-	wire rxelecidle_out;                                                            
-	wire sata_user_clk; 
+	wire 		rx_charisk_out;
+	wire 		rxelecidle_out;                                                            
+	wire 		sata_user_clk; 
 																																												 
 	wire [31:0] data_in_p_int; //for CONT primitive handling
 	reg         cont_flag;
@@ -109,8 +85,10 @@ module sata_link_layer #(
 	reg         data_in_rd_last_word;
 	reg         minimum_send_two_sync;
 	reg   [1:0] r_rdy_wait_count;
-	
-		
+	reg         x_rdy_sent_t;
+	reg         dma_terminated;
+	reg         r_ok_send_t;
+
 	wire [31:0] data_scrmb_in;
 	reg         tx_crc_en;
 	reg         current_data_rdy_T;
@@ -136,7 +114,7 @@ module sata_link_layer #(
 	begin                                                                                   
 		if (rst)                                                                            
 			phy_detect_T <= 1'b0;                                                                 
-		else if(PHYRDY)                                                                      
+		else if(phyrdy)                                                                      
 			phy_detect_T <= 1'b1;                                                                
 		else                                                                                
 			phy_detect_T <= 1'b0;
@@ -248,7 +226,7 @@ module sata_link_layer #(
 //      rx_charisk_in_int <= 0;      
 //    end
 //    else begin 
-//      //if(PHYRDY) begin
+//      //if(phyrdy) begin
 //        if ((data_in_p == `CONT) && RX_CHARISK_IN) begin
 //          data_in_p_int     <= data_in_p_int;
 //          cont_flag         <= 1'b1;
@@ -299,42 +277,40 @@ module sata_link_layer #(
 		end
 	end //always
 			
-		
-	//main state machine
-	always @(posedge clk, posedge rst)
+	always @(posedge clk)
 	begin 
 		if (rst) begin
-			state           <= `L_IDLE ;
-			scrmb_en        <= 1'b 0 ;
-			scrmb_rst       <= 1'b 1 ;
-			unscrmb_en_fsm      <= 1'b 0 ;
-			unscrmb_rst     <= 1'b 1 ;
-			crc_en_tx       <= 1'b 0 ;
+			state           <= `L_IDLE;
+			scrmb_en        <= 1'b0;
+			scrmb_rst       <= 1'b1;
+			unscrmb_en_fsm  <= 1'b0;
+			unscrmb_rst     <= 1'b1;
+			crc_en_tx       <= 1'b0;
 			data_out_p_int      <= 32'h 00000000 ;
 			data_unscr_in   <= 32'h 00000000 ;
 			cntrl_char_int      <= 1'b 0 ;
-			crc_rx_rst      <= 1'b 0;
-			illegal_state_t <= 1'b 0;
-			tx_termn_T_o    <= 1'b 0;
-			R_OK_T          <= 1'b 0;
-			R_ERR_T         <= 1'b 0;
-			rx_fail_T       <= 1'b 0;
-			crc_err_T       <= 1'b 0;
-			valid_CRC_T     <= 1'b 0 ;
-			SOF_T           <= 1'b 0;
-			eof_t_int           <= 1'b 0;
+			crc_rx_rst      <= 1'b0;
+			illegal_state_t <= 1'b0;
+			tx_termn_T_o    <= 1'b0;
+			R_OK_T          <= 1'b0;
+			R_ERR_T         <= 1'b0;
+			rx_fail_T       <= 1'b0;
+			crc_err_T       <= 1'b0;
+			valid_CRC_T     <= 1'b0;
+			SOF_T           <= 1'b0;
+			eof_t_int           <= 1'b0;
 			//cntrl_char_int      <= 1'b 0;
-			tx_rdy_ack_t    <= 1'b 0;
-			data_out_vld_t_int  <= 1'b 0;
-			data_in_rd_en_t <= 1'b 0;
+			tx_rdy_ack_t    <= 1'b0;
+			data_out_vld_t_int  <= 1'b0;
+			data_in_rd_en_t <= 1'b0;
 			tx_crc_en       <= 0;
 			crc_tx_rst      <= 0;
-			X_RDY_SENT_T    <= 0;
-			R_OK_SENT_T     <= 0;
+			x_rdy_sent_t    <= 0;
+			r_ok_send_t     <= 0;
 			data_in_rd_last_word  <= 0;
 			minimum_send_two_sync <= 0;
 			r_rdy_wait_count      <= 2'h0;
-			DMA_TERMINATED        <= 0;
+			dma_terminated        <= 0;
 			hold_arrived          <= 0;
 	
 		end   
@@ -352,7 +328,7 @@ module sata_link_layer #(
 				tx_termn_T_o    <= 0;
 			 
 				illegal_state_t <= 0;
-				R_OK_SENT_T     <= 0;
+				r_ok_send_t     <= 0;
 				R_OK_T          <= 0;
 				R_ERR_T         <= 0;
 				rx_fail_T       <= 0;
@@ -360,9 +336,9 @@ module sata_link_layer #(
 				data_in_rd_en_t <= 0;
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				r_rdy_wait_count <= 2'h0;
-				if (PHYRDY)
+				if (phyrdy)
 				begin
 					if (minimum_send_two_sync == 0) begin
 						state                 <= `L_IDLE;
@@ -374,7 +350,6 @@ module sata_link_layer #(
 					end 
 					else if(TX_RDY_T) begin
 						state <= `HL_SendChkRdy ;    //for Host 
-						// state <= `DL_SendChkRdy ;   //for Device
 						tx_rdy_ack_t <= 1'b 1 ;
 						minimum_send_two_sync <= 0;
 						r_rdy_wait_count <= 2'h0;
@@ -400,7 +375,7 @@ module sata_link_layer #(
 						state <= `L_IDLE ;
 					end       
 				end          
-				else begin// if (!PHYRDY)
+				else begin// if (!phyrdy)
 					state <= `L_NoCommErr ;
 					minimum_send_two_sync <= 0;
 				end          
@@ -417,7 +392,7 @@ module sata_link_layer #(
 				tx_termn_T_o    <= 0; 
 				
 				illegal_state_t <= 0;
-				R_OK_SENT_T     <= 0;
+				r_ok_send_t     <= 0;
 				R_OK_T          <= 0;
 				R_ERR_T         <= 0;
 				rx_fail_T       <= 0;
@@ -425,9 +400,9 @@ module sata_link_layer #(
 				data_in_rd_en_t <= 0;
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `X_RDY || data_in_p_int == `SYNC)) begin
 						state <= `L_IDLE ;
 					end
@@ -449,7 +424,7 @@ module sata_link_layer #(
 			begin
 				state           <= `L_NoComm; 
 				illegal_state_t <= 0;
-				R_OK_SENT_T     <= 0;
+				r_ok_send_t     <= 0;
 				R_OK_T          <= 0;
 				R_ERR_T         <= 0;
 				rx_fail_T       <= 0;
@@ -458,7 +433,7 @@ module sata_link_layer #(
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
 			end          // state : L_NoCommErr
 
@@ -472,7 +447,7 @@ module sata_link_layer #(
 				cntrl_char_int      <= 1'b 1 ;
 
 				illegal_state_t <= 0;
-				R_OK_SENT_T     <= 0;
+				r_ok_send_t     <= 0;
 				R_OK_T          <= 0;
 				R_ERR_T         <= 0;
 				rx_fail_T       <= 0;
@@ -481,9 +456,9 @@ module sata_link_layer #(
 
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					state     <= `L_SendAlign;
 				end 
 				else begin
@@ -501,7 +476,7 @@ module sata_link_layer #(
 				cntrl_char_int      <= 1'b 1;  
 				
 				illegal_state_t <= 0;
-				R_OK_SENT_T     <= 0;
+				r_ok_send_t     <= 0;
 				R_OK_T          <= 0;
 				R_ERR_T         <= 0;
 				rx_fail_T       <= 0;
@@ -509,9 +484,9 @@ module sata_link_layer #(
 				data_in_rd_en_t <= 0;
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					 state <= `L_IDLE ;
 				end
 				else begin
@@ -532,7 +507,7 @@ module sata_link_layer #(
 				rx_fail_T       <= 0;
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
 				if (LRESET) begin
 					state <= `L_RESET ;
@@ -558,8 +533,8 @@ module sata_link_layer #(
 				tx_rdy_ack_t    <= 0;
 				valid_CRC_T     <= 0;
 				crc_err_T       <= 0;
-				R_OK_SENT_T     <= 0;
-				X_RDY_SENT_T    <= 1;
+				r_ok_send_t     <= 0;
+				x_rdy_sent_t    <= 1;
 				rx_fail_T       <= 0;
 				
 				R_OK_T          <= 0;
@@ -567,7 +542,7 @@ module sata_link_layer #(
 				tx_crc_en       <= 0;
 				illegal_state_t <= 0;        
 
-				if(PHYRDY)// edited by tintu : checking PHYRDY from device
+				if(phyrdy)// edited by tintu : checking phyrdy from device
 				begin
 					if (rx_charisk_in_int && (data_in_p_int == `X_RDY)) begin
 						state           <= `L_RcvWaitFifo;
@@ -602,7 +577,7 @@ module sata_link_layer #(
 						r_rdy_wait_count <= 2'h0;
 					end
 				end    
-				else begin //!PHYRDY
+				else begin //!phyrdy
 					illegal_state_t <= 1;
 					state           <= `L_NoCommErr;
 					data_in_rd_en_t <= 0;
@@ -613,46 +588,6 @@ module sata_link_layer #(
 			
 
 			/*************************** end HL_SendChkRdy ***********************/
-
-			/************************* start DL_SendChkRdy ***********************/
-
-			`DL_SendChkRdy:
-			begin
-				data_out_p_int      <= `X_RDY ;
-				cntrl_char_int      <= 1; 
-				valid_CRC_T     <= 0;
-				crc_err_T       <= 0;
-				R_OK_SENT_T     <= 0;
-				rx_fail_T       <= 0;
-				
-				R_OK_T          <= 0;
-				R_ERR_T         <= 0;
-				illegal_state_t <= 0;
-				tx_crc_en       <= 0;
-				X_RDY_SENT_T    <= 1;
-				
-				if(PHYRDY)// edited by tintu : checking PHYRDY from device
-				begin
-					if ((rx_charisk_in_int && (data_in_p_int == `R_RDY)) && count_for_align != 8'hFD && count_for_align != 8'hFE && count_for_align != 8'hFF) begin
-						state           <= `L_SendSOF ;
-						data_in_rd_en_t <= 1;
-						crc_tx_rst      <= 1;
-						scrmb_rst       <= 1;
-					end
-					else begin
-						state           <= `DL_SendChkRdy ;
-						data_in_rd_en_t <= 0;
-						crc_tx_rst      <= 0;
-					end
-				end
-				else begin//!PHYRDY
-					state           <= `L_NoCommErr ;
-					data_in_rd_en_t <= 0;
-					crc_tx_rst      <= 0;
-				end
-			end             // state : DL_SendChkRdy
-
-			/*************************** end DL_SendChkRdy ************************/
 
 			/**************************** start L_SendSOF *************************/
 
@@ -666,10 +601,10 @@ module sata_link_layer #(
 				R_ERR_T         <= 0;
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `SYNC)) begin
 						state           <= `L_IDLE;
 						data_in_rd_en_t <= 0;
@@ -682,7 +617,7 @@ module sata_link_layer #(
 						scrmb_rst    <= 1'b 0;
 						data_in_rd_en_t <= 1;
 						illegal_state_t <= 0;
-						DMA_TERMINATED  <= 0;
+						dma_terminated  <= 0;
 					end
 				end
 				else begin
@@ -716,10 +651,10 @@ module sata_link_layer #(
 				R_OK_T       <= 0;
 				R_ERR_T      <= 0;
 				crc_tx_rst   <= 0;
-				X_RDY_SENT_T <= 0;
+				x_rdy_sent_t <= 0;
 				rx_fail_T    <= 0;
 
-				if(PHYRDY) begin// edited by tintu : checking PHYRDY from device
+				if(phyrdy) begin// edited by tintu : checking phyrdy from device
 					if (EscapeCF_T) begin
 						illegal_state_t <= 0;
 						state           <= `L_SyncEscape ;
@@ -750,7 +685,7 @@ module sata_link_layer #(
 						tx_crc_en       <= 0;
 						hold_arrived    <= 0;
 					end
-					else if (count_for_align == 8'hFE ) begin
+					else if (count_for_align == 8'hFE) begin
 						illegal_state_t <= 0;
 						state           <= `L_SendData ;
 						data_in_rd_en_t <= 0;
@@ -774,13 +709,6 @@ module sata_link_layer #(
 					else if (!(rx_charisk_in_int && (data_in_p_int == `HOLD)) && !(rx_charisk_in_int && (data_in_p_int ==  `DMAT)) &&
 										!(rx_charisk_in_int && (data_in_p_int == `SYNC)) && (current_data_rdy_T) && !frame_end_T &&
 										 (count_for_align != 8'hFE) && (count_for_align != 8'hFF)) begin
-//            state           <= `L_SendData ;
-//            data_in_rd_en_t <= data_rdy_T;
-//            crc_en_tx       <= data_in_rd_en_t;
-//            scrmb_en        <= data_in_rd_en_t;
-//            scrmb_rst       <= 0;            
-//            tx_crc_en       <= 0;
-//            hold_arrived    <= 0; 
 						if(data_in_rd_last_word) begin
 							state                 <= `L_SendData ;
 							data_in_rd_en_t       <= 1;
@@ -800,7 +728,6 @@ module sata_link_layer #(
 							hold_arrived          <= 0; 
 							data_in_rd_last_word  <= 0;              
 						end
-						
 					end else if (rx_charisk_in_int && (data_in_p_int == `DMAT)) begin
 						tx_termn_T_o    <= 1;
 						illegal_state_t <= 0;
@@ -810,7 +737,7 @@ module sata_link_layer #(
 						scrmb_en        <= 1;
 						scrmb_rst       <= 0;
 						tx_crc_en       <= 1;
-						DMA_TERMINATED  <= 1;
+						dma_terminated  <= 1;
 						hold_arrived    <= 0;
 					end else if (frame_end_T && !(rx_charisk_in_int && (data_in_p_int == `SYNC)) &&  !(rx_charisk_in_int && (data_in_p_int == `DMAT))) begin
 						illegal_state_t <= 0;
@@ -849,7 +776,7 @@ module sata_link_layer #(
 					end
 					
 				end
-				else // !PHYRDY
+				else // !phyrdy
 				begin
 					illegal_state_t <= 1;
 					state           <= `L_NoCommErr ;
@@ -879,10 +806,10 @@ module sata_link_layer #(
 				R_OK_T       <= 0;
 				R_ERR_T      <= 0;
 				crc_tx_rst   <= 0;
-				X_RDY_SENT_T <= 0;
+				x_rdy_sent_t <= 0;
 				rx_fail_T    <= 0;
 
-				if(PHYRDY)// edited by tintu : checking PHYRDY from device
+				if(phyrdy)// edited by tintu : checking phyrdy from device
 				begin
 					if (EscapeCF_T) begin //tintu : High priority
 						illegal_state_t <= 0;
@@ -944,7 +871,7 @@ module sata_link_layer #(
 						scrmb_rst       <= 0;
 						tx_crc_en       <= 0;
 					end
-				end else begin //!PHYRDY
+				end else begin //!phyrdy
 					illegal_state_t <= 1;
 					state           <= `L_NoCommErr ;
 					data_in_rd_en_t <= 0;
@@ -972,11 +899,11 @@ module sata_link_layer #(
 				R_OK_T       <= 0;
 				R_ERR_T      <= 0;
 				crc_tx_rst   <= 0;
-				X_RDY_SENT_T <= 0;
+				x_rdy_sent_t <= 0;
 				rx_fail_T    <= 0;
 				
 				
-				if(PHYRDY)// edited by tintu : checking PHYRDY from device
+				if(phyrdy)// edited by tintu : checking phyrdy from device
 				begin
 					if ((rx_charisk_in_int && (data_in_p_int == `HOLD)) && data_rdy_T) begin
 						illegal_state_t <= 0;
@@ -1075,9 +1002,9 @@ module sata_link_layer #(
 				R_OK_T          <= 0;
 				R_ERR_T         <= 0;
 				tx_crc_en       <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `SYNC)) begin
 						illegal_state_t <= 1 ;
 						state           <= `L_IDLE ;
@@ -1112,9 +1039,9 @@ module sata_link_layer #(
 				R_ERR_T         <= 0;
 				tx_crc_en       <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `SYNC)) begin
 						illegal_state_t <= 1;  
 						state           <= `L_IDLE;
@@ -1147,9 +1074,9 @@ module sata_link_layer #(
 				scrmb_en        <= 0;
 				scrmb_rst       <= 1;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY)
+				if (phyrdy)
 				begin
 					if (rx_charisk_in_int && (data_in_p_int == `R_OK))
 					begin
@@ -1204,7 +1131,7 @@ module sata_link_layer #(
 				cntrl_char_int      <= 1'b 1;
 				valid_CRC_T     <= 1'b 0;
 				crc_err_T       <= 1'b 0;
-				R_OK_SENT_T     <= 1'b 0;
+				r_ok_send_t     <= 1'b 0;
 				
 				data_in_rd_en_t <= 0;
 				R_OK_T          <= 0;
@@ -1214,9 +1141,9 @@ module sata_link_layer #(
 				scrmb_en        <= 0;
 				scrmb_rst       <= 1;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `X_RDY)) begin
 						state          <= `L_RcvChkRdy ;
 						SOF_T          <= 0;
@@ -1280,9 +1207,9 @@ module sata_link_layer #(
 				scrmb_en        <= 0;
 				scrmb_rst       <= 1;
 				illegal_state_t <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `X_RDY)) begin
 						if (rx_FIFO_rdy) begin
 							state <= `L_RcvChkRdy ;
@@ -1320,7 +1247,7 @@ module sata_link_layer #(
 				scrmb_en        <= 0;
 				scrmb_rst       <= 1;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
 				if (tx_termn_T_i) begin
 					data_out_p_int <= `DMAT ;
@@ -1331,7 +1258,7 @@ module sata_link_layer #(
 				cntrl_char_int <= 1'b 1 ;
 				
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (EscapeCF_T) begin
 						state           <= `L_SyncEscape ;
 						eof_t_int           <= 0;
@@ -1435,9 +1362,9 @@ module sata_link_layer #(
 				scrmb_en        <= 0;
 				scrmb_rst       <= 1;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (EscapeCF_T) begin
 						state           <= `L_SyncEscape ;
 						unscrmb_en_fsm  <= 0;
@@ -1518,7 +1445,7 @@ module sata_link_layer #(
 				scrmb_en        <= 0;
 				scrmb_rst       <= 1;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
 				if (tx_termn_T_i) begin
 					data_out_p_int <= `DMAT ;  // to signal the transmitter to terminate the transmission.
@@ -1529,7 +1456,7 @@ module sata_link_layer #(
 					cntrl_char_int <= 1;
 				end      
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `HOLD || data_in_p_int == `ALIGN)) begin
 						state           <= `L_RcvHold ;
 						unscrmb_en_fsm  <= 1;
@@ -1571,7 +1498,7 @@ module sata_link_layer #(
 						rx_fail_T       <= 1;
 					end
 				end
-				else if (!PHYRDY) begin
+				else if (!phyrdy) begin
 					state           <= `L_NoCommErr ;
 					unscrmb_en_fsm  <= 0;
 					unscrmb_rst     <= 1;
@@ -1599,9 +1526,9 @@ module sata_link_layer #(
 				scrmb_rst       <= 1;
 				illegal_state_t <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 								
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (data_crc_out_rx == 32'h 00000000) begin
 						valid_CRC_T <= 1;
 						crc_err_T   <= 0;
@@ -1643,9 +1570,9 @@ module sata_link_layer #(
 				scrmb_rst       <= 1;
 				
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (Good_status_T) begin
 						state     <= `L_GoodEnd ;
 						rx_fail_T <= 0;
@@ -1678,7 +1605,7 @@ module sata_link_layer #(
 			begin
 				data_out_p_int      <= `R_OK;
 				cntrl_char_int      <= 1'b 1;
-				R_OK_SENT_T     <= 1'b 1;
+				r_ok_send_t     <= 1'b 1;
 				crc_err_T       <= 0;
 				valid_CRC_T     <= valid_CRC_T;
 				
@@ -1691,9 +1618,9 @@ module sata_link_layer #(
 				scrmb_rst       <= 1;
 				illegal_state_t <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `SYNC)) begin
 						state     <= `L_IDLE ;
 						rx_fail_T <= 0;
@@ -1729,9 +1656,9 @@ module sata_link_layer #(
 				scrmb_rst       <= 1;
 				illegal_state_t <= 0;
 				crc_tx_rst      <= 0;
-				X_RDY_SENT_T    <= 0;
+				x_rdy_sent_t    <= 0;
 				
-				if (PHYRDY) begin
+				if (phyrdy) begin
 					if (rx_charisk_in_int && (data_in_p_int == `SYNC))
 					begin
 						rx_fail_T <= 0;

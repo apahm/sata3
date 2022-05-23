@@ -2,9 +2,9 @@
 
 module sata_control #(
 	// Width of S_AXI data bus
-	parameter integer C_S_AXI_DATA_WIDTH	= 32,
+	parameter integer AXI_DATA_WIDTH	= 32,
 	// Width of S_AXI address bus
-	parameter integer C_S_AXI_ADDR_WIDTH	= 5
+	parameter integer AXI_ADDR_WIDTH	= 5
 )
 (
 	// Global Clock Signal
@@ -12,7 +12,7 @@ module sata_control #(
 	// Global Reset Signal. This Signal is Active LOW
 	input wire  S_AXI_ARESETN,
 	// Write address (issued by master, acceped by Slave)
-	input wire [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_AWADDR,
+	input wire [AXI_ADDR_WIDTH-1 : 0] S_AXI_AWADDR,
 	// Write channel Protection type. This signal indicates the
    	// privilege and security level of the transaction, and whether
    	// the transaction is a data access or an instruction access.
@@ -24,11 +24,11 @@ module sata_control #(
    	// to accept an address and associated control signals.
 	output wire  S_AXI_AWREADY,
 	// Write data (issued by master, acceped by Slave) 
-	input wire [C_S_AXI_DATA_WIDTH-1 : 0] S_AXI_WDATA,
+	input wire [AXI_DATA_WIDTH-1 : 0] S_AXI_WDATA,
 	// Write strobes. This signal indicates which byte lanes hold
    	// valid data. There is one write strobe bit for each eight
    	// bits of the write data bus.    
-	input wire [(C_S_AXI_DATA_WIDTH/8)-1 : 0] S_AXI_WSTRB,
+	input wire [(AXI_DATA_WIDTH/8)-1 : 0] S_AXI_WSTRB,
 	// Write valid. This signal indicates that valid write
    	// data and strobes are available.
 	input wire  S_AXI_WVALID,
@@ -45,7 +45,7 @@ module sata_control #(
    	// can accept a write response.
 	input wire  S_AXI_BREADY,
 	// Read address (issued by master, acceped by Slave)
-	input wire [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_ARADDR,
+	input wire [AXI_ADDR_WIDTH-1 : 0] S_AXI_ARADDR,
 	// Protection type. This signal indicates the privilege
    	// and security level of the transaction, and whether the
    	// transaction is a data access or an instruction access.
@@ -57,7 +57,7 @@ module sata_control #(
    	// ready to accept an address and associated control signals.
 	output wire  S_AXI_ARREADY,
 	// Read data (issued by slave)
-	output wire [C_S_AXI_DATA_WIDTH-1 : 0] S_AXI_RDATA,
+	output wire [AXI_DATA_WIDTH-1 : 0] S_AXI_RDATA,
 	// Read response. This signal indicates the status of the
    	// read transfer.
 	output wire [1 : 0] S_AXI_RRESP,
@@ -70,39 +70,39 @@ module sata_control #(
 );
 
 	// AXI4LITE signals
-	reg [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_awaddr;
+	reg [AXI_ADDR_WIDTH-1 : 0] 	axi_awaddr;
 	reg  							axi_awready;
 	reg  							axi_wready;
 	reg [1 : 0] 	axi_bresp;
 	reg  	axi_bvalid;
-	reg [C_S_AXI_ADDR_WIDTH-1 : 0] 	axi_araddr;
+	reg [AXI_ADDR_WIDTH-1 : 0] 	axi_araddr;
 	reg  	axi_arready;
-	reg [C_S_AXI_DATA_WIDTH-1 : 0] 	axi_rdata;
+	reg [AXI_DATA_WIDTH-1 : 0] 	axi_rdata;
 	reg [1 : 0] 	axi_rresp;
 	reg  	axi_rvalid;
 
 	// Example-specific design signals
-	// local parameter for addressing 32 bit / 64 bit C_S_AXI_DATA_WIDTH
+	// local parameter for addressing 32 bit / 64 bit AXI_DATA_WIDTH
 	// ADDR_LSB is used for addressing 32/64 bit registers/memories
 	// ADDR_LSB = 2 for 32 bits (n downto 2)
 	// ADDR_LSB = 3 for 64 bits (n downto 3)
-	localparam integer ADDR_LSB = (C_S_AXI_DATA_WIDTH/32) + 1;
+	localparam integer ADDR_LSB = (AXI_DATA_WIDTH/32) + 1;
 	localparam integer OPT_MEM_ADDR_BITS = 2;
 	//----------------------------------------------
 	//-- Signals for user logic register space example
 	//------------------------------------------------
 	//-- Number of Slave Registers 8
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg0;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg1;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg2;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg3;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg4;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg5;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg6;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	slv_reg7;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg0;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg1;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg2;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg3;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg4;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg5;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg6;
+	reg [AXI_DATA_WIDTH-1:0]	slv_reg7;
 	wire	 slv_reg_rden;
 	wire	 slv_reg_wren;
-	reg [C_S_AXI_DATA_WIDTH-1:0]	 reg_data_out;
+	reg [AXI_DATA_WIDTH-1:0]	 reg_data_out;
 	integer	 byte_index;
 	reg	 aw_en;
 
@@ -226,56 +226,56 @@ module sata_control #(
 	      begin
 	        case ( axi_awaddr[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] )
 	          3'h0:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 0
 	                slv_reg0[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          3'h1:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 1
 	                slv_reg1[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          3'h2:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 2
 	                slv_reg2[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          3'h3:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 3
 	                slv_reg3[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          3'h4:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 4
 	                slv_reg4[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          3'h5:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 5
 	                slv_reg5[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          3'h6:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 6
 	                slv_reg6[(byte_index*8) +: 8] <= S_AXI_WDATA[(byte_index*8) +: 8];
 	              end  
 	          3'h7:
-	            for ( byte_index = 0; byte_index <= (C_S_AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
+	            for ( byte_index = 0; byte_index <= (AXI_DATA_WIDTH/8)-1; byte_index = byte_index+1 )
 	              if ( S_AXI_WSTRB[byte_index] == 1 ) begin
 	                // Respective byte enables are asserted as per write strobes 
 	                // Slave register 7

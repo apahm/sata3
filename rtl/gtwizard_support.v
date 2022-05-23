@@ -1,10 +1,9 @@
 `timescale 1ns / 1ps
 `define DLY #1
 
-module gtwizard_0_support #
-(
-    parameter EXAMPLE_SIM_GTRESET_SPEEDUP            = "TRUE",     // Simulation setting for GT SecureIP model
-    parameter STABLE_CLOCK_PERIOD                    = 6         //Period of the stable clock driving this state-machine, unit is [ns]
+module gtwizard_0_support #(
+    parameter EXAMPLE_SIM_GTRESET_SPEEDUP            = "TRUE",    
+    parameter STABLE_CLOCK_PERIOD                    = 6         
 
 )
 (
@@ -17,10 +16,10 @@ module gtwizard_0_support #
     output          gt0_rx_fsm_reset_done_out,
     input           gt0_data_valid_in,
  
-    output   gt0_txusrclk_out,
-    output   gt0_txusrclk2_out,
-    output   gt0_rxusrclk_out,
-    output   gt0_rxusrclk2_out,
+    output          gt0_txusrclk_out,
+    output          gt0_txusrclk2_out,
+    output          gt0_rxusrclk_out,
+    output          gt0_rxusrclk2_out,
     //_________________________________________________________________________
     //GT0  (X1Y0)
     //____________________________CHANNEL PORTS________________________________
