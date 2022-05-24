@@ -1,57 +1,55 @@
 `timescale 1ns / 1ps
 
 module sata_transport (
-    input                clk,
-    input                reset,                   
-    input                DMA_RQST,                     // host sets during DMA Read or Write operations
-    input   [31:0]       data_in,                      // from host : shadow register write data
-    input   [4:0]        addr_reg,                     // Address line 
-    input   [31:0]       data_link_in,                 // from link layer to transport data_in
-    input                LINK_DMA_ABORT,               // Notification  from  Link layer that the DMA Abort primitive was received
-    input                link_fis_recved_frm_dev,      // from link layer to inform that new fis received from PHY
-    input                phy_detect,                   // from link phy detection
-    input                H_write,                      // from host to transport ...reg H_write
-    input                H_read,                       // from host to transport ...reg H_read
-    input                link_txr_rdy,                 // from link, link sends it satus when link receive txr rdy from transport
-    input                r_ok,                         // from link successful reception
-    input                r_error,                      // from link error in reception
-    input                illegal_state,                // from link link denotes illegal state transition to transport
-    input                end_status,                   // from link eof
-    output      [31:0]   data_link_out,                // from transport data out to link
-    output               FRAME_END_T,                  // T-layer indicates all data for the frame has been transferred
-    output  reg          IPF,                          // interrupt bit is set by the device, TL set  interrupt pending flag to host
-    output  reg          hold_L,                       // to link layer :To indicate that the RX Fifo is full
-    output               WRITE_HOLD_U,                 // inform the host Layer that  the TX  Fifo is full or RX fifo is empty
-    output               READ_HOLD_U,
-    output  reg          txr_rdy,                      // to link layer transport is H_ready to send pkt to link
-    output  reg [31:0]   data_out,                     // data read from transport to host
-    output  reg          EscapeCF_T,                   // During SRST Link layer shall be informed to send  EscapeCF_TP   by TL.
+    input   wire                clk,
+    input   wire                reset,                   
+    input   wire                DMA_RQST,                     // host sets during DMA Read or Write operations
+    input   wire [31:0]         data_in,                      // from host : shadow register write data
+    input   wire [4:0]          addr_reg,                     // Address line 
+    input   wire [31:0]         data_link_in,                 // from link layer to transport data_in
+    input   wire                LINK_DMA_ABORT,               // Notification  from  Link layer that the DMA Abort primitive was received
+    input   wire                link_fis_recved_frm_dev,      // from link layer to inform that new fis received from PHY
+    input   wire                phy_detect,                   // from link phy detection
+    input   wire                H_write,                      // from host to transport ...reg H_write
+    input   wire                H_read,                       // from host to transport ...reg H_read
+    input   wire                link_txr_rdy,                 // from link, link sends it satus when link receive txr rdy from transport
+    input   wire                r_ok,                         // from link successful reception
+    input   wire                r_error,                      // from link error in reception
+    input   wire                illegal_state,                // from link link denotes illegal state transition to transport
+    input   wire                end_status,                   // from link eof
+    output  wire [31:0]         data_link_out,                // from transport data out to link
+    output  wire                FRAME_END_T,                  // T-layer indicates all data for the frame has been transferred
+    output  reg                 IPF,                          // interrupt bit is set by the device, TL set  interrupt pending flag to host
+    output  reg                 hold_L,                       // to link layer :To indicate that the RX Fifo is full
+    output  wire                WRITE_HOLD_U,                 // inform the host Layer that  the TX  Fifo is full or RX fifo is empty
+    output  wire                READ_HOLD_U,
+    output  reg                 txr_rdy,                      // to link layer transport is H_ready to send pkt to link
+    output  reg [31:0]          data_out,                     // data read from transport to host
+    output  reg                 EscapeCF_T,                   // During SRST Link layer shall be informed to send  EscapeCF_TP   by TL.
    
-    output  reg          UNRECGNZD_FIS_T,              // to LL :asserted, when the host TL receives a FIS with unknown type
-    output  reg          FIS_ERR,                      // to link layer
-    output  reg          Good_status_T,                // to LL : Asserted in return to getting the VALID_CRC_T from the LL
-    output  reg          cmd_done,                     // to host : inidicates that the given command is over 
-    input     [31:0]     DMA_TX_DATA_IN,               // from host : data line for DMA write operation
-    input                DMA_TX_WEN,                   // from host : data write enable signal to TX FIFO during DMA write
-    output    [31:0]     DMA_RX_DATA_OUT,              // to host : data line for DMA read operation
-    input                DMA_RX_REN,                   // from host : data read enable signal to RX FIFO during DMA read
-    input                VALID_CRC_T,                  // from LL : no CRC error
-    input                data_out_vld_T,               // from LL : valid data
-    input                CRC_ERR_T,                    // from LL :  CRC error
-    input                DMA_INIT,                     // from host : completed DMA initialization
-    output  reg          DMA_END,
-    output               DATA_RDY_T,                   // to LL : T-layer indicates the availability of next Dword 
-    output               RX_FIFO_RDY,                  // Receive FIFO ready
-    input                data_link_rd_en_t,            // read enable from link layer for tx data out
-    input                PIO_CLK_IN,                   // Clock for PIO transfer
-    input                DMA_CLK_IN,                   // Clock for DMA transfer
-    input                CE,                           // Chip enable,
-    input                RX_FIFO_RESET,                // RX fifo reset
-    input                TX_FIFO_RESET,                // TX fifo reset
-    output reg           DMA_data_rcv_error            // Indicates error during DMA data receive
+    output  reg                 UNRECGNZD_FIS_T,              // to LL :asserted, when the host TL receives a FIS with unknown type
+    output  reg                 FIS_ERR,                      // to link layer
+    output  reg                 Good_status_T,                // to LL : Asserted in return to getting the VALID_CRC_T from the LL
+    output  reg                 cmd_done,                     // to host : inidicates that the given command is over 
+    input   wire [31:0]         DMA_TX_DATA_IN,               // from host : data line for DMA write operation
+    input   wire                DMA_TX_WEN,                   // from host : data write enable signal to TX FIFO during DMA write
+    output  wire [31:0]         DMA_RX_DATA_OUT,              // to host : data line for DMA read operation
+    input   wire                DMA_RX_REN,                   // from host : data read enable signal to RX FIFO during DMA read
+    input   wire                VALID_CRC_T,                  // from LL : no CRC error
+    input   wire                data_out_vld_T,               // from LL : valid data
+    input   wire                CRC_ERR_T,                    // from LL :  CRC error
+    input   wire                DMA_INIT,                     // from host : completed DMA initialization
+    output  reg                 DMA_END,
+    output  wire                DATA_RDY_T,                   // to LL : T-layer indicates the availability of next Dword 
+    output  wire                RX_FIFO_RDY,                  // Receive FIFO ready
+    input   wire                data_link_rd_en_t,            // read enable from link layer for tx data out
+    input   wire                PIO_CLK_IN,                   // Clock for PIO transfer
+    input   wire                DMA_CLK_IN,                   // Clock for DMA transfer
+    input   wire                CE,                           // Chip enable,
+    input   wire                RX_FIFO_RESET,                // RX fifo reset
+    input   wire                TX_FIFO_RESET,                // TX fifo reset
+    output  reg                 DMA_data_rcv_error            // Indicates error during DMA data receive
 ); 
-   
-
 
     parameter    DMA_WR_MAX_COUNT = 'h2000; //'h200; //'d8192 bytes
        
@@ -263,31 +261,30 @@ module sata_transport (
     assign link_txr_rdy_PIO      = link_txr_rdy? 1'b1:txr_ren_pio;
     //assign tx_fifo_dma_rd_en     = (~tx_fifo_empty && link_txr_rdy_PIO && (state == HT_DMAOTrans2 ) && (count!= 'd2044));
    
-    always @(posedge clk)
-    begin
-      if(reset) begin
-        rcv_fifo_rd_en_dly   <=      1'b0;
-      end   
-      else begin
-        rcv_fifo_rd_en_dly   <=      rx_ren_pio;
-      end
+    always @(posedge clk) begin
+        if(reset) begin
+            rcv_fifo_rd_en_dly   <=      1'b0;
+        end   
+        else begin
+            rcv_fifo_rd_en_dly   <=      rx_ren_pio;
+        end
     end  
 
   
   
     //***************************** makindg PIO Data Transfer count *****************************
     always @(posedge clk, posedge reset) begin
-      if(reset) begin  
-        Transfer_cnt_PIO       <= 1'b0  ;
-      end
-      else begin
-        if(state == HT_PIOITrans1 || state == HT_PIOOTrans1) begin  
-          Transfer_cnt_PIO  <= fis_reg_DW4[15:0] ; 
+        if(reset) begin  
+            Transfer_cnt_PIO       <= 1'b0  ;
         end
         else begin
-          Transfer_cnt_PIO <= Transfer_cnt_PIO ;
+            if(state == HT_PIOITrans1 || state == HT_PIOOTrans1) begin  
+                Transfer_cnt_PIO  <= fis_reg_DW4[15:0] ; 
+            end
+            else begin
+                Transfer_cnt_PIO <= Transfer_cnt_PIO ;
+            end
         end
-      end
     end  
 
     //***************************** makindg cmd _en & cntrl_en signals *****************************
@@ -428,27 +425,27 @@ module sata_transport (
     //*************************************************************************************************
     always @(posedge clk)
     begin
-      if(reset) begin
-        command_register      <=  8'hff     ;
-        control_register      <=  8'h00     ;
-        features_register     <=  16'h0000  ;           
-        dev_head_register     <=  8'h00     ;  
-        error_register        <=  8'h00    ;     
-        lba_low_register      <=  16'h0000  ;    
-        lba_mid_register      <=  16'h0000  ;    
-        lba_high_register     <=  16'h0000  ;   
-        sector_count_register <=  16'h0000  ;               
-        data_register_in      <=  32'd0   ;
-        //IPF                   <=  1'b0    ; 
-        //HOLD_U                <=  1'b0    ;
-        tx_wen_pio            <=  1'b0    ;
-        tx_fifo_pio_wr_en     <= 0;
-      end
+        if(reset) begin
+            command_register      <=  8'hff     ;
+            control_register      <=  8'h00     ;
+            features_register     <=  16'h0000  ;           
+            dev_head_register     <=  8'h00     ;  
+            error_register        <=  8'h00    ;     
+            lba_low_register      <=  16'h0000  ;    
+            lba_mid_register      <=  16'h0000  ;    
+            lba_high_register     <=  16'h0000  ;   
+            sector_count_register <=  16'h0000  ;               
+            data_register_in      <=  32'd0   ;
+            //IPF                   <=  1'b0    ; 
+            //HOLD_U                <=  1'b0    ;
+            tx_wen_pio            <=  1'b0    ;
+            tx_fifo_pio_wr_en     <= 0;
+        end
     // shadow register writing.........only bsy bit and drdy is proper........//
-      else begin
+        else begin
         //if(H_write && !DMA_RQST) begin
         if(H_write && CE) begin
-          case(addr_reg )
+          case(addr_reg)
             cmd_reg: begin
               tx_fifo_pio_wr_en <= 0;
               if((!status_register[7] && !status_register[3]) || (data_in == DEVICE_RESET) )begin        
@@ -628,44 +625,44 @@ module sata_transport (
   //*************************************************************************
 
     always @(posedge clk) begin
-      if (reset) begin  
-          txr_rdy             <= 1'b0;
-          state               <= HT_HostIdle ;
-          H_read_count        <= 16'd0;
-          rcv_fifo_wr_en      <= 1'b0;
-          data_rcv_fifo       <= 32'd0;
-          data_link_out_int   <= 32'd0;
-          //frame_end_T        <= 1'b0;
-          FIS_ERR             <= 1'b0;
-          UNRECGNZD_FIS_T     <= 1'b0;
-          Good_status_T       <= 1'b0;
-          hold_L              <= 1'b0;
-          recv_pio_dma_cnt    <= 16'd0;
-          count               <= 16'b0;
-          cmd_done            <= 1'd0;
-          prvs_pio            <= 1'b0;
-          fis_reg_DW0         <= 32'b0;
-          fis_reg_DW1         <= 32'b0;
-          fis_reg_DW2         <= 32'b0;
-          fis_reg_DW3         <= 32'b0;
-          fis_reg_DW4         <= 32'b0;
-          fis_reg_DW5         <= 32'b0;
-          fis_reg_DW6         <= 32'b0;
-          fis_count           <= 3'd0;
-          EscapeCF_T          <= 1'b0;
-          //data_rdy_T         <= 1'b0;
-          tl_ll_tx_fifo_reset <= 0;
-          data_link_out_wr_en <= 0;
-          pio_rcv_flag  <= 0;
-          tx_fifo_pio_rd_en   <= 0;
-          temp_status_reg     <= 8'h00;
-          direction_bit       <= 1;
-          //Transfer_cnt_DMA  <= 32'b0;
-          DMA_rcv_flag        <= 0;
-          recv_dma_cnt        <= 16'h0;
-          rst_delay_count     <= 3'h0;
-          DMA_data_rcv_error  <= 0;
-      end  
+        if (reset) begin  
+            txr_rdy             <= 1'b0;
+            state               <= HT_HostIdle ;
+            H_read_count        <= 16'd0;
+            rcv_fifo_wr_en      <= 1'b0;
+            data_rcv_fifo       <= 32'd0;
+            data_link_out_int   <= 32'd0;
+            //frame_end_T        <= 1'b0;
+            FIS_ERR             <= 1'b0;
+            UNRECGNZD_FIS_T     <= 1'b0;
+            Good_status_T       <= 1'b0;
+            hold_L              <= 1'b0;
+            recv_pio_dma_cnt    <= 16'd0;
+            count               <= 16'b0;
+            cmd_done            <= 1'd0;
+            prvs_pio            <= 1'b0;
+            fis_reg_DW0         <= 32'b0;
+            fis_reg_DW1         <= 32'b0;
+            fis_reg_DW2         <= 32'b0;
+            fis_reg_DW3         <= 32'b0;
+            fis_reg_DW4         <= 32'b0;
+            fis_reg_DW5         <= 32'b0;
+            fis_reg_DW6         <= 32'b0;
+            fis_count           <= 3'd0;
+            EscapeCF_T          <= 1'b0;
+            //data_rdy_T         <= 1'b0;
+            tl_ll_tx_fifo_reset <= 0;
+            data_link_out_wr_en <= 0;
+            pio_rcv_flag  <= 0;
+            tx_fifo_pio_rd_en   <= 0;
+            temp_status_reg     <= 8'h00;
+            direction_bit       <= 1;
+            //Transfer_cnt_DMA  <= 32'b0;
+            DMA_rcv_flag        <= 0;
+            recv_dma_cnt        <= 16'h0;
+            rst_delay_count     <= 3'h0;
+            DMA_data_rcv_error  <= 0;
+        end  
       else if(detection) begin
       
         case(state)
@@ -941,8 +938,7 @@ module sata_transport (
             end 
           end         
                
-          HT_CtrlTransStatus:
-          begin
+          HT_CtrlTransStatus : begin
             data_link_out_wr_en <= 0;
             if(r_ok) begin       
               state <= HT_HostIdle ;
